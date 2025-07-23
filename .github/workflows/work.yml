@@ -1,0 +1,13 @@
+name: work-1    <- 이름
+on:
+  push:
+    branches:    
+      - main       <- main브랜치에 뭔가가 푸쉬된다면 워크 플로우가 실행된다. / 즉 언제 실행되는가?
+jobs:
+  hello1:   
+    runs-on: ubuntu-latest   <- 어떤 작업을 할건데 어떤 인프라에서 작업을 할것인지 / ubuntu-latest는  GitHub가 해당 job을  Ubuntu 최신 버전이 설치된 가상 머신을 의미 
+    steps:
+      - name: sayHi   <- 첫번째 작업 이름
+        run: echo "Hi"     <- shell 명령어
+      - name: sayMyName     <- 두번째 작업 이름
+        run: echo "${{ github.actor }}"   <- shell 명령어 
