@@ -1,6 +1,7 @@
 package com.example.f_f.global.api.dto;
 
 import com.example.f_f.global.api.entity.Item;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
@@ -11,30 +12,33 @@ import lombok.Setter;
 @XmlRootElement(name = "item")
 public class ItemDto {
 
-    @JacksonXmlProperty(localName = "PTNT_PRDLST_CRTR_CD")
-    private String ptnt_PRDLST_CRTR_CD;
+    @JsonProperty("PTNT_PRDLST_CRTR_CD")
+    private String PTNT_PRDLST_CRTR_CD;  // 특허 제품 기준 코드
 
-    @JacksonXmlProperty(localName = "PRDLST_NM")
-    private String PRDLST_NM;
+    @JsonProperty("PRDLST_NM")
+    private String PRDLST_NM;  // 제품명
 
-    @JacksonXmlProperty(localName = "DRUG_CPNT_KOR_NM")
-    private String DRUG_CPNT_KOR_NM;
+    @JsonProperty("DRUG_CPNT_KOR_NM")
+    private String DRUG_CPNT_KOR_NM;  // 주성분명(한글)
 
-    @JacksonXmlProperty(localName = "DRUG_CPNT_ENG_NM")
-    private String DRUG_CPNT_ENG_NM;
+    @JsonProperty("DRUG_CPNT_ENG_NM")
+    private String DRUG_CPNT_ENG_NM;  // 주성분명(영문)
 
-    @JacksonXmlProperty(localName = "BSSH_NM")
-    private String BSSH_NM;
+    @JsonProperty("BSSH_NM")
+    private String BSSH_NM;  // 업체명
 
-    @JacksonXmlProperty(localName = "PTHD_NM")
-    private String pthd_NM;
+    @JsonProperty("PTHD_NM")
+    private String PTHD_NM;  // 출원자명
 
-    @JacksonXmlProperty(localName = "PTNT_REG_DT")
-    private String PTNT_REG_DT;
+    @JsonProperty("PTNT_REG_DT")
+    private String PTNT_REG_DT;  // 특허 등록일
 
-    @JacksonXmlProperty(localName = "PTNT_NO")
-    private String ptnt_NO;
+    @JsonProperty("PTNT_NO")
+    private String PTNT_NO;  // 특허번호
 
+/*
+API 응답 -> DTO 파싱 -> DTO를 엔티티로 변환
+ */
     public Item toEntity() {
         return Item.builder()
                 .PRDLST_NM(PRDLST_NM)
@@ -42,9 +46,9 @@ public class ItemDto {
                 .DRUG_CPNT_ENG_NM(DRUG_CPNT_ENG_NM)
                 .BSSH_NM(BSSH_NM)
                 .PTNT_REG_DT(PTNT_REG_DT)
-                .PTNT_NO(ptnt_NO)
-                .PTHD_NM(pthd_NM)
-                .PTNT_PRDLST_CRTR_CD(ptnt_PRDLST_CRTR_CD)
+                .PTNT_NO(PTNT_NO)
+                .PTHD_NM(PTHD_NM)
+                .PTNT_PRDLST_CRTR_CD(PTNT_PRDLST_CRTR_CD)
                 .build();
     }
 }
