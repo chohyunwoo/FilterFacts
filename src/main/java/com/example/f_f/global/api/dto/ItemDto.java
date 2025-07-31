@@ -36,9 +36,9 @@ public class ItemDto {
     @JsonProperty("PTNT_NO")
     private String PTNT_NO;  // 특허번호
 
-/*
-API 응답 -> DTO 파싱 -> DTO를 엔티티로 변환
- */
+    /*
+    API 응답 -> DTO 파싱 -> DTO를 엔티티로 변환
+     */
     public Item toEntity() {
         return Item.builder()
                 .PRDLST_NM(PRDLST_NM)
