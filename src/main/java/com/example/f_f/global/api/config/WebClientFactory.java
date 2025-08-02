@@ -19,6 +19,8 @@ public class WebClientFactory {
             throw new IllegalArgumentException("해당 API 설정이 존재하지 않습니다: " + apiName);
         }
 
+        System.out.println("🌐 WebClient 생성 - API 이름: " + apiName + ", baseUrl: " + config.getBaseUrl());
+
         // baseUrl을 기반으로 WebClient 생성하여 반환
         return WebClient.builder()
                 .baseUrl(config.getBaseUrl())

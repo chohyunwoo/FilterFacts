@@ -6,16 +6,16 @@ import com.example.f_f.global.api.entity.DrugItem;
 import com.example.f_f.global.api.repository.DrugItemRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,83 +23,86 @@ public class DrugItemService {
 
     private final WebClientFactory webClientFactory;
     private final DrugItemRepository drugItemRepository;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${drug.api.service-key}")
     private String serviceKey;
 
-    @Value("${external-api.apis.drug.base-url}")
-    private String drugBaseUrl;
+    // @Value("${external-api.apis.drug.base-url}")
+    // private String drugBaseUrl;
 
-    public void fetchAndSaveDrugItems(String itemName, String startDate, String endDate, Integer pageNo, Integer numOfRows) {
+    @PostConstruct
+    public void init() {
+        System.out.println("✅ DrugItemService.init() 실행됨");
+
+        // 테스트용 임시 하드코딩
+        fetchAndSave("아세트아미노펜");
+    }
+
+    public void fetchAndSave(String itemName) {
+        WebClient client = webClientFactory.create("drug");
+
         try {
-            WebClient client = webClientFactory.create("drug");
-
+            // itemName URL 인코딩
             String encodedItemName = URLEncoder.encode(itemName, StandardCharsets.UTF_8);
 
+
+            // 먼저 URI 만들기
+            String baseUrl = "https://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService06";
             URI uri = UriComponentsBuilder
-                    .fromUriString(drugBaseUrl)
-                    .path("/getDrugPrdtPrmsnDtlInq05")
-                    .queryParam("serviceKey", serviceKey)
+                    .fromHttpUrl(baseUrl + "/getDrugPrdtPrmsnDtlInq05")
+                    .queryParam("serviceKey", serviceKey) // ✅ 인코딩 안 함
                     .queryParam("type", "json")
-                    .queryParam("pageNo", pageNo)
-                    .queryParam("numOfRows", numOfRows)
-                    .queryParam("item_name", encodedItemName)
-                    .queryParam("start_change_date", startDate)
-                    .queryParam("end_change_date", endDate)
-                    .build(true)
+                    .build(true) // ✅ false: 직접 넘긴 값은 인코딩하지 않음
                     .toUri();
 
-            System.out.println("🔗 요청 URI: " + uri);
 
-            String response = client.get()
-                    .uri(uri)
+            // 2️⃣ URI 로그 찍기
+            System.out.println("🔗 최종 요청 URI (상대경로): " + uri.toString());
+
+            // 3️⃣ 요청 보내기
+            String response = WebClient.create()
+                    .get()
+                    .uri(uri) // ✅ 최종 URI 직접 사용
                     .header("Accept", "application/json")
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
 
-            System.out.println("✅ 응답 원문:\n" + response);
+            System.out.println("🔍 drug 응답 원문:\n" + response);
 
+            if (response == null || response.isBlank()) {
+                System.out.println("⚠️ 응답이 비어있습니다.");
+                return;
+            }
+
+            // 혹시 HTML 응답일 경우 예외 처리
+            if (response.trim().startsWith("<")) {
+                System.err.println("❗ HTML 형식의 오류 응답 수신:\n" + response);
+                return;
+            }
+
+            // JSON 파싱
             JsonNode root = objectMapper.readTree(response);
             JsonNode itemsNode = root.path("body").path("items");
-            System.out.println("itemsNode = " + itemsNode);
-
-            List<DrugItem> list = new ArrayList<>();
 
             if (itemsNode.isArray()) {
-                System.out.println("itemsNode는 배열");
                 for (JsonNode itemNode : itemsNode) {
-                    System.out.println("itemNode = " + itemNode);
-                    // json 역직렬화
                     DrugItemDto dto = objectMapper.treeToValue(itemNode, DrugItemDto.class);
-                    System.out.println("dto = " + dto);
-                    list.add(convertToEntity(dto));
+                    System.out.println("✅ 저장 대상: " + dto.getItemName());
+                    drugItemRepository.save(convertToEntity(dto));
                 }
             } else if (!itemsNode.isMissingNode() && !itemsNode.isNull()) {
-                System.out.println("itemsNode가 일단 배열은 아니고 null도 아님");
                 DrugItemDto dto = objectMapper.treeToValue(itemsNode, DrugItemDto.class);
-                list.add(convertToEntity(dto));
-            }
-
-
-            System.out.println("list.isEmpty() = " + list.isEmpty());
-            for (DrugItem drugItem : list) {
-                System.out.println("drugItem = " + drugItem);
-            }
-
-
-
-
-            if (!list.isEmpty()) {
-                drugItemRepository.saveAll(list);
-                System.out.println("💾 저장된 항목 수: " + list.size());
+                System.out.println("✅ 저장 대상 (단일): " + dto.getItemName());
+                drugItemRepository.save(convertToEntity(dto));
             } else {
-                System.out.println("⚠️ 저장할 데이터가 없습니다.");
+                System.out.println("⚠️ 유효한 데이터가 없습니다.");
             }
 
         } catch (Exception e) {
-            System.err.println("❌ API 데이터 처리 중 오류 발생");
+            System.err.println("❌ API 처리 중 오류 발생");
             e.printStackTrace();
         }
     }

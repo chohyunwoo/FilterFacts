@@ -26,6 +26,7 @@ public class HffkApiService {
     public void fetchAndSave() {
         WebClient client = webClientFactory.create("hffk");
 
+
         try {
             String response = client.get()
                     .uri(uriBuilder -> uriBuilder
