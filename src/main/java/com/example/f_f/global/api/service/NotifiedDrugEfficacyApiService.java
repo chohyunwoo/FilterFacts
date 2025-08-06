@@ -1,8 +1,8 @@
 package com.example.f_f.global.api.service;
 
 import com.example.f_f.global.api.config.WebClientFactory;
-import com.example.f_f.global.api.dto.HffkItemDto;
-import com.example.f_f.global.api.repository.HffkItemRepository;
+import com.example.f_f.global.api.dto.NotifiedDrugEfficacyDto;
+import com.example.f_f.global.api.repository.NotifiedDrugEfficacyRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -12,36 +12,35 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-public class HffkApiService {
+public class NotifiedDrugEfficacyApiService {
 
     private final WebClientFactory webClientFactory;
-    private final HffkItemRepository hffkItemRepository;
+    private final NotifiedDrugEfficacyRepository notifiedDrugEfficacyRepository;
 
     @PostConstruct
     public void init() {
-        System.out.println("✅ HffkApiService.init() 실행됨");
+        System.out.println("✅ NotifiedDrugEfficacyApiService.init() 실행됨");
         fetchAndSave();
     }
 
     public void fetchAndSave() {
-        WebClient client = webClientFactory.create("hffk");
-
+        WebClient client = webClientFactory.create("efficacy");
 
         try {
             String response = client.get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/getMdcinRtrvlSleStpgeEtcItem03")
+                            .path("/getRareSelfmdcin")
                             .queryParam("serviceKey", "53tJdl6UQo5j8vhnSE27VsFSrcqGypGC2i85Phqih6xywcnFtJjjA3rUTTylcKv41fB4SsCULspZ4M4IKmS6tA==")
                             .queryParam("type", "json")
-                            .queryParam("numOfRows", 100) // 원하는 개수 설정
-                            .queryParam("pageNo", 1)      // 페이지 설정 (반복 호출에 사용 가능)
+                            .queryParam("pageNo", 1)
+                            .queryParam("numOfRows", 100)
                             .build())
                     .header("Accept", "application/json")
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
 
-            System.out.println("🔍 응답 원문:\n" + response);
+            System.out.println("🔍nofifiedDrug 응답 원문:\n" + response);
 
             if (response == null || response.isBlank()) return;
 
@@ -53,9 +52,9 @@ public class HffkApiService {
                 for (JsonNode wrapper : items) {
                     JsonNode itemNode = wrapper.path("item");
                     if (!itemNode.isMissingNode()) {
-                        HffkItemDto dto = objectMapper.treeToValue(itemNode, HffkItemDto.class);
-                        System.out.println("✅ 저장 대상: " + dto.getITEM_SEQ());
-                        hffkItemRepository.save(dto.toEntity());
+                        NotifiedDrugEfficacyDto dto = objectMapper.treeToValue(itemNode, NotifiedDrugEfficacyDto.class);
+                        System.out.println("✅ 저장 대상: " + dto.getDrugName());
+                        notifiedDrugEfficacyRepository.save(dto.toEntity());
                     }
                 }
             }
@@ -64,5 +63,4 @@ public class HffkApiService {
             e.printStackTrace();
         }
     }
-
 }

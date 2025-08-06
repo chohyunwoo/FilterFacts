@@ -2,6 +2,7 @@ package com.example.f_f.global.api.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Component // 스프링 컴포넌트로 등록
@@ -24,6 +25,10 @@ public class WebClientFactory {
         // baseUrl을 기반으로 WebClient 생성하여 반환
         return WebClient.builder()
                 .baseUrl(config.getBaseUrl())
+                .exchangeStrategies(ExchangeStrategies.builder()    // 기본 maxInMemorySize(256KB) 초과로 인한 예외 방지용 - 대용량 응답 대비 10MB로 설정
+                        .codecs(clientCodecConfigurer ->
+                                clientCodecConfigurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // 10MB
+                        .build())
                 .build();
     }
 }

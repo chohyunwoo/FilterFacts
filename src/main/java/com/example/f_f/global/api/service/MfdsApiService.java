@@ -25,7 +25,6 @@ public class MfdsApiService {
 
     public void fetchAndSaveData() {
         WebClient client1 = webClientFactory.create("mfds");
-        WebClient client2 = webClientFactory.create("mfds");
 
         try {
             // ✅ 1. JSON 형식으로 API 호출
@@ -34,6 +33,8 @@ public class MfdsApiService {
                             .path("/getDrugDmstPtntStusService")
                             .queryParam("serviceKey", "53tJdl6UQo5j8vhnSE27VsFSrcqGypGC2i85Phqih6xywcnFtJjjA3rUTTylcKv41fB4SsCULspZ4M4IKmS6tA==")
                             .queryParam("type", "json") // ✅ JSON 요청
+                            .queryParam("numOfRows", 50) // 원하는 개수 설정
+                            .queryParam("pageNo", 1)      // 페이지 설정 (반복 호출에 사용 가능)
                             .build())
                     .header("Accept", "application/json")
                     .retrieve()

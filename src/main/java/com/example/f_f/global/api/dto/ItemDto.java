@@ -2,7 +2,6 @@ package com.example.f_f.global.api.dto;
 
 import com.example.f_f.global.api.entity.Item;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.Setter;
