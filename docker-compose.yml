@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: Testdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 3684
+    ports:
+      - "5433:5432"  # 로컬 PostgreSQL과 충돌 방지
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - ff-network
+
+  backend:
+    build:
+      context: .
+    container_name: filterfacts-backend
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/Testdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 3684
+    networks:
+      - ff-network
+
+volumes:
+  db-data:
+
+networks:
+  ff-network:
