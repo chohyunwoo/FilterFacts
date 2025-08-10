@@ -22,13 +22,13 @@
 postgres 계정 비밀번호는 각자 로컬환경에서 설정한 값을 사용
 
 ### 3. 초기 데이터 복원
-# (선택) 비밀번호를 환경변수에 저장
+(선택) 비밀번호를 환경변수에 저장
 export PGPASSWORD='본인_PostgreSQL_비밀번호'
 
 # 복원 실행
 psql -h 127.0.0.1 -p 5432 -U postgres -d TestDb -f db/seed/initial.sql
 
-# (선택) 환경변수 제거
+(선택) 환경변수 제거
 unset PGPASSWORD
 
 ### 복원 확인
