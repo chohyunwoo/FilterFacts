@@ -3,11 +3,8 @@ package com.example.f_f.global.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+
 @Entity
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,12 +22,4 @@ public class Report {
     @Column(name = "rawmtrl_nm", columnDefinition = "TEXT")
     private String rawmtrlNm;
 
-    @Column(name = "indiv_rawmtrl_nm", columnDefinition = "TEXT")
-    private String indivRawmtrlNm;
-
-    @Column(name = "etc_rawmtrl_nm", columnDefinition = "TEXT")
-    private String etcRawmtrlNm;
-
-    @Column(name = "cap_rawmtrl_nm", columnDefinition = "TEXT")
-    private String capRawmtrlNm;      // 기능지표성분 (ex: 진세노사이드 Rg1 등)
 }

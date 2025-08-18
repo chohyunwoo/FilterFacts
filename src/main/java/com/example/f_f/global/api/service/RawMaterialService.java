@@ -1,8 +1,8 @@
 package com.example.f_f.global.api.service;
 
 import com.example.f_f.global.api.config.WebClientFactory;
-import com.example.f_f.global.api.dto.ReportDto;
-import com.example.f_f.global.api.repository.ReportRepository;
+import com.example.f_f.global.api.dto.RawMaterialDto;
+import com.example.f_f.global.api.repository.RawMaterialRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -14,10 +14,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-public class ReportService {
+public class RawMaterialService {
 
     private final WebClientFactory webClientFactory;
-    private final ReportRepository reportRepository;
+    private final RawMaterialRepository rawMaterialRepository;
 
     @PostConstruct
     public void init() {
@@ -26,13 +26,13 @@ public class ReportService {
 
     @Transactional
     public void fetchAndSave() {
-        WebClient client = webClientFactory.create("Report");
+        WebClient client = webClientFactory.create("RawMaterial");
 
         try {
             String response = client.get()
                     .uri(b -> b.pathSegment(
-                            "2da40e9812a643ebbdc6",  // TODO: 환경변수/설정 분리 권장
-                            "I0030",                 // TODO: 실제 서비스ID 확인 필요
+                            "2da40e9812a643ebbdc6", // TODO: 환경변수/설정으로 분리
+                            "I-0040",               // TODO: 실제 서비스ID 확인 필요
                             "json",
                             "1",
                             "100"
@@ -57,8 +57,8 @@ public class ReportService {
 
             for (JsonNode item : rows) {
                 try {
-                    ReportDto dto = om.treeToValue(item, ReportDto.class);
-                    reportRepository.save(dto.toEntity());
+                    RawMaterialDto dto = om.treeToValue(item, RawMaterialDto.class);
+                    rawMaterialRepository.save(dto.toEntity());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -66,6 +66,7 @@ public class ReportService {
 
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
 }

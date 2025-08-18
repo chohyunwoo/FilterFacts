@@ -22,26 +22,12 @@ public class ReportDto {
     @JsonProperty("RAWMTRL_NM")
     private String rawmtrlNm;
 
-    // 기능성 원재료 (예: 홍삼농축액, 비타민C)
-    @JsonProperty("INDIV_RAWMTRL_NM")
-    private String indivRawmtrlNm;
-
-    // 기타 원재료 (첨가제, 부원료)
-    @JsonProperty("ETC_RAWMTRL_NM")
-    private String etcRawmtrlNm;
-
-    // 캡슐 원재료 (젤라틴, HPMC 등)
-    @JsonProperty("CAP_RAWMTRL_NM")
-    private String capRawmtrlNm;
 
     public Report toEntity() {
         return Report.builder()
                 .prdlstReportNo(prdlstReportNo)
                 .primaryFnclty(primaryFnclty)
                 .rawmtrlNm(rawmtrlNm)
-                .indivRawmtrlNm(indivRawmtrlNm)
-                .etcRawmtrlNm(etcRawmtrlNm)
-                .capRawmtrlNm(capRawmtrlNm)
                 .build();
     }
 }
