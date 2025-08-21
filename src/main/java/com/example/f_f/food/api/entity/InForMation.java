@@ -14,7 +14,7 @@ public class InForMation {
 
     // 품목제조관리번호 (PK)
     @Id
-    @Column(name = "sttemnt_no", length = 50, nullable = false)
+    @Column(name = "product_report_no", length = 50, nullable = false)
     private String sttemntNo;
 
     // 제품명
@@ -22,11 +22,11 @@ public class InForMation {
     private String prduct;
 
     // 업체명
-    @Column(name = "entrps", length = 200)
+    @Column(name = "ltd", length = 200)
     private String entrps;
 
     // 주된 기능성 (효능)
-    @Column(name = "main_fnctn", columnDefinition = "TEXT")
+    @Column(name = "functionalities", columnDefinition = "TEXT")
     private String mainFnctn;
 
 }

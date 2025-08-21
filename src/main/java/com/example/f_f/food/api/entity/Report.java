@@ -13,13 +13,13 @@ public class Report {
 
 
     @Id
-    @Column(name = "prdlst_report_no", nullable = false, length = 50)
+    @Column(name = "product_report_no", nullable = false, length = 50)
     private String prdlstReportNo;
 
-    @Column(name = "primary_fnclty", columnDefinition = "TEXT")
+    @Column(name = "functionality", columnDefinition = "TEXT")
     private String primaryFnclty;
 
-    @Column(name = "rawmtrl_nm", columnDefinition = "TEXT")
+    @Column(name = "raw_materials", columnDefinition = "TEXT")
     private String rawmtrlNm;
 
 }

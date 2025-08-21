@@ -20,10 +20,6 @@ public class RawMaterialDto {
     @JsonProperty("BSSH_NM")
     private String bssh_nm;
 
-    //업종
-    @JsonProperty("INDUTY_NM")
-    private String induty_nm;
-
     //신청 원료명
     @JsonProperty("APLC_RAWMTRL_NM")
     private String aplc_rawmtrl_nm;
@@ -37,7 +33,6 @@ public class RawMaterialDto {
         return RawMaterial.builder()
                 .hf_fnclty_mtral_rcogn_no(hf_fnclty_mtral_rcogn_no)
                 .bssh_nm(bssh_nm)
-                .induty_nm(induty_nm)
                 .aplc_rawmtrl_nm(aplc_rawmtrl_nm)
                 .fnclty_cn(fnclty_cn)
                 .build();

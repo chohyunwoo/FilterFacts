@@ -13,23 +13,19 @@ import lombok.NoArgsConstructor;
 public class RawMaterial {
 
     @Id   // 인정번호
-    @Column(name = "hf_fnclty_mtral_rcogn_no", nullable = false, length = 50)
+    @Column(name = "verification_no", nullable = false, length = 50)
     private String hf_fnclty_mtral_rcogn_no;
 
     //업체명
-    @Column(name = "bssh_nm", columnDefinition = "TEXT")
+    @Column(name = "ltd", columnDefinition = "TEXT")
     private String bssh_nm;
 
-    //업종
-    @Column(name = "induty_nm", columnDefinition = "TEXT")
-    private String induty_nm;
-
     //신청 원료명
-    @Column(name = "aplc_rawmtrl_nm", columnDefinition = "TEXT")
+    @Column(name = "raw_material", columnDefinition = "TEXT")
     private String aplc_rawmtrl_nm;
 
     //기능성 내용
-    @Column(name = "fnclty_cn", columnDefinition = "TEXT")
+    @Column(name = "functionality", columnDefinition = "TEXT")
     private String fnclty_cn;
 
 }
