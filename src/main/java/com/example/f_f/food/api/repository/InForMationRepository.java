@@ -1,6 +1,6 @@
-package com.example.f_f.global.api.repository;
+package com.example.f_f.food.api.repository;
 
-import com.example.f_f.global.api.entity.InForMation;
+import com.example.f_f.food.api.entity.InForMation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.example.f_f.global.api.entity;
+package com.example.f_f.food.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

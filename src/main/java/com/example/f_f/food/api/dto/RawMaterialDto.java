@@ -1,11 +1,8 @@
-package com.example.f_f.global.api.dto;
+package com.example.f_f.food.api.dto;
 
-import com.example.f_f.global.api.entity.RawMaterial;
-import com.example.f_f.global.api.entity.Report;
+import com.example.f_f.food.api.entity.RawMaterial;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.*;
 
 @Getter

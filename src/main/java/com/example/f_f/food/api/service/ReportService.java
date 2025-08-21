@@ -1,8 +1,8 @@
-package com.example.f_f.global.api.service;
+package com.example.f_f.food.api.service;
 
-import com.example.f_f.global.api.config.WebClientFactory;
-import com.example.f_f.global.api.dto.RawMaterialDto;
-import com.example.f_f.global.api.repository.RawMaterialRepository;
+import com.example.f_f.global.config.WebClientFactory;
+import com.example.f_f.food.api.dto.ReportDto;
+import com.example.f_f.food.api.repository.ReportRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -14,10 +14,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-public class RawMaterialService {
+public class ReportService {
 
     private final WebClientFactory webClientFactory;
-    private final RawMaterialRepository rawMaterialRepository;
+    private final ReportRepository reportRepository;
 
     @PostConstruct
     public void init() {
@@ -26,13 +26,13 @@ public class RawMaterialService {
 
     @Transactional
     public void fetchAndSave() {
-        WebClient client = webClientFactory.create("RawMaterial");
+        WebClient client = webClientFactory.create("Report");
 
         try {
             String response = client.get()
                     .uri(b -> b.pathSegment(
-                            "2da40e9812a643ebbdc6", // TODO: 환경변수/설정으로 분리
-                            "I-0040",               // TODO: 실제 서비스ID 확인 필요
+                            "2da40e9812a643ebbdc6",  // TODO: 환경변수/설정 분리 권장
+                            "I0030",                 // TODO: 실제 서비스ID 확인 필요
                             "json",
                             "1",
                             "100"
@@ -57,8 +57,8 @@ public class RawMaterialService {
 
             for (JsonNode item : rows) {
                 try {
-                    RawMaterialDto dto = om.treeToValue(item, RawMaterialDto.class);
-                    rawMaterialRepository.save(dto.toEntity());
+                    ReportDto dto = om.treeToValue(item, ReportDto.class);
+                    reportRepository.save(dto.toEntity());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -66,7 +66,6 @@ public class RawMaterialService {
 
         } catch (Exception e) {
             e.printStackTrace();
-
         }
     }
 }

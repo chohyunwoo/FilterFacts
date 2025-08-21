@@ -1,4 +1,4 @@
-package com.example.f_f.global.api.config;
+package com.example.f_f.global.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

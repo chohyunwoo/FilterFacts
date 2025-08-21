@@ -1,6 +1,6 @@
 package com.example.f_f;
 
-import com.example.f_f.global.api.config.ApiProperties;
+import com.example.f_f.global.config.ApiProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

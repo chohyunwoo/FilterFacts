@@ -1,7 +1,6 @@
-package com.example.f_f.global.api.dto;
+package com.example.f_f.food.api.dto;
 
-import com.example.f_f.global.api.entity.InForMation;
-import com.fasterxml.jackson.annotation.JsonAlias;
+import com.example.f_f.food.api.entity.InForMation;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

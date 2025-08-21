@@ -1,4 +1,4 @@
-package com.example.f_f.global.api.config;
+package com.example.f_f.global.config;
 
 // Lombok을 사용해 getter/setter 자동 생성
 import lombok.Getter;

@@ -1,8 +1,8 @@
-package com.example.f_f.global.api.service;
+package com.example.f_f.food.api.service;
 
-import com.example.f_f.global.api.config.WebClientFactory;
-import com.example.f_f.global.api.dto.InForMationDto;
-import com.example.f_f.global.api.repository.InForMationRepository;
+import com.example.f_f.global.config.WebClientFactory;
+import com.example.f_f.food.api.dto.InForMationDto;
+import com.example.f_f.food.api.repository.InForMationRepository;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
