@@ -34,3 +34,7 @@ unset PGPASSWORD
 ### 복원 확인
 psql -h 127.0.0.1 -p 5432 -U postgres -d TestDb -c "\dt"
   - 테이블 목록이 정상적으로 보이면 성공
+
+
+## 로컬에 브랜치 생성 후 원격 브랜치와 연결하는 방법
+ - git checkout -b (브랜치명) origin(원격 브랜치명)
