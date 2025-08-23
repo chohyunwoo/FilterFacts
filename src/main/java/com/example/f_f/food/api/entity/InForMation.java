@@ -18,7 +18,7 @@ public class InForMation {
     private String sttemntNo;
 
     // 제품명
-    @Column(name = "prduct", length = 200)
+    @Column(name = "product", length = 200)
     private String prduct;
 
     // 업체명

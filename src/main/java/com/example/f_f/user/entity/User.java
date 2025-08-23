@@ -14,11 +14,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "\"user\"")
+@Table(name = "users")
 public class User {
 
     @Id
-    @Column(name = "user_id", length = 50)
+    @Column(name = "user_id", length = 50, nullable = false, unique = true)
     private String userId;
 
     @Column(name = "password", nullable = false, length = 255)

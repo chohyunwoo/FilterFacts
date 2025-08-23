@@ -38,7 +38,7 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return new UserLoginResponse("로그인 성공");
+        return new UserLoginResponse(true,"로그인 성공");
     }
 
 

@@ -46,6 +46,9 @@ dependencies {
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 
+
+    // 외부 AI 서버 REST 호출
+    implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient
 }
 
 tasks.named('test') {
