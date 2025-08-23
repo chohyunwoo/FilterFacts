@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="회원가입"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
+
+        <!-- 이메일 -->
+        <EditText
+            android:id="@+id/email_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="이메일"
+            android:inputType="textEmailAddress"
+            android:minHeight="48dp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/send_code_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="인증코드 전송" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/resend_code_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="재전송" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/code_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="인증코드 6자리"
+            android:inputType="number"
+            android:maxLength="6"
+            android:minHeight="48dp"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/verify_code_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="인증코드 확인"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 아이디/비밀번호 -->
+        <EditText
+            android:id="@+id/userId_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="아이디"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/password_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="비밀번호 (6자 이상)"
+            android:inputType="textPassword"
+            android:minHeight="48dp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/register_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="가입하기"
+            android:enabled="false" />
+
+        <TextView
+            android:id="@+id/status_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="#444444" />
+    </LinearLayout>
+</ScrollView>

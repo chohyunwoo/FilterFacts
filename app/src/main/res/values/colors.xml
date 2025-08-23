@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="ai_bg">#0B0F19</color>
+    <color name="ai_text">#000000</color>
+    <color name="ai_muted">#A1A1AA</color>
+    <color name="ai_brand">#0D6EFD</color>
+    <color name="ai_panel">#1AFFFFFF</color>
+    <color name="ai_glass">#14FFFFFF</color>
+    <color name="ai_border">#20FFFFFF</color>
+</resources>
