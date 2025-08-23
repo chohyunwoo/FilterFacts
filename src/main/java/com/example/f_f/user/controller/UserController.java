@@ -31,5 +31,4 @@ public class UserController {
         System.out.println("✅ 로그인 요청이 도착했습니다: " + request);
         return ResponseEntity.ok(userService.login(request));
     }
-
 }

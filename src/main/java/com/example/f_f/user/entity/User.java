@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "\"user\"")
+@Table(name = "\"user\"") // user가 SQL 예약어일 수 있어 따옴표로 감싸는 것이 안전합니다.
 public class User {
 
     @Id
@@ -23,4 +23,7 @@ public class User {
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;
+
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    private String email;
 }
