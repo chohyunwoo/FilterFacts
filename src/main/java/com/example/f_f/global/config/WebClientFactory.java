@@ -1,6 +1,8 @@
 package com.example.f_f.global.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -29,6 +31,20 @@ public class WebClientFactory {
                         .codecs(clientCodecConfigurer ->
                                 clientCodecConfigurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // 10MB
                         .build())
+                .build();
+    }
+
+    @Bean
+    public WebClient fastApiClient(
+            @Value("${fastapi.base-url}") String baseUrl
+    ) {
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .exchangeStrategies(
+                        ExchangeStrategies.builder()
+                                .codecs(c -> c.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+                                .build()
+                )
                 .build();
     }
 }
