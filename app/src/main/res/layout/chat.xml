@@ -237,8 +237,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="12dp"
-            android.background="@drawable/bg_glass_panel">
+            android:padding="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
