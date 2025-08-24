@@ -2,7 +2,7 @@ package com.example.f_f.chat.service;
 
 import com.example.f_f.chat.dto.AnswerResponse;
 import com.example.f_f.chat.dto.ChatMessageDto;
-import com.example.f_f.chat.dto.Role;
+import com.example.f_f.config.Role;
 import com.example.f_f.chat.entity.ChatMessage;
 import com.example.f_f.chat.entity.Conversation;
 import com.example.f_f.chat.repository.ChatMessageRepository;

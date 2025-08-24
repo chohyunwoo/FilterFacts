@@ -1,6 +1,6 @@
 package com.example.f_f.chat.entity;
 
-import com.example.f_f.chat.dto.Role;
+import com.example.f_f.config.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

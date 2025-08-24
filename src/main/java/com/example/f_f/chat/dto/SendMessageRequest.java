@@ -1,13 +1,11 @@
 package com.example.f_f.chat.dto;
 
 
-import com.example.f_f.user.dto.Category;
+import com.example.f_f.config.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

@@ -1,4 +1,4 @@
-package com.example.f_f.user.dto;
+package com.example.f_f.config;
 
 public enum Category {
     FOOD,
