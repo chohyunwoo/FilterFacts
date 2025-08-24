@@ -32,14 +32,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest req) {
-        System.out.println("req.userId() = " + req.userId());
-        System.out.println("req.email() = " + req.email());
-        System.out.println("req.password() = " + req.password());
         if (users.existsByUserId(req.userId())) {
             return ResponseEntity.status(409).body("userId already exists");
         }
 
-        // ✅ 회원가입 전에 이메일 인증 완료 여부 확인 (purpose="signup")
+        // 회원가입 전에 이메일 인증 완료 여부 확인 (purpose="signup")
         emailVerificationService.ensureVerified(req.email(), "signup");
 
         User u = new User();
@@ -56,8 +53,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest req) {
-        System.out.println("req.password() = " + req.password());
-        System.out.println("req.username() = " + req.username());
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.username(), req.password())
         );
