@@ -7,7 +7,6 @@ import com.example.f_f.chat.entity.ChatMessage;
 import com.example.f_f.chat.entity.Conversation;
 import com.example.f_f.chat.repository.ChatMessageRepository;
 import com.example.f_f.chat.repository.ConversationRepository;
-import com.example.f_f.user.entity.User;
 import com.example.f_f.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -3,7 +3,6 @@ package com.example.f_f.chat.controller;
 import com.example.f_f.chat.dto.AnswerResponse;
 import com.example.f_f.chat.dto.ChatMessageDto;
 import com.example.f_f.chat.dto.QuestionRequest;
-import com.example.f_f.chat.entity.ChatMessage;
 import com.example.f_f.chat.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,10 +18,10 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
 
     @GetMapping("/messages")
-    public Page<ChatMessageDto> listMessages(@RequestParam Long conversationId,
+    public ResponseEntity<Page<ChatMessageDto>> listMessages(@RequestParam Long conversationId,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "50") int size) {
-        return chatMessageService.listMessages(conversationId, page, size);
+        return ResponseEntity.ok(chatMessageService.listMessages(conversationId, page, size));
     }
 
     /** 안드로이드: 질문 → (AI)응답 한 번에 */
