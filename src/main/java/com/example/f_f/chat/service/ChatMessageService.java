@@ -58,7 +58,7 @@ public class ChatMessageService {
         // 채팅 메시지 저장
         ChatMessage m = ChatMessage.builder()
                 .conversation(conv)
-                .role(Role.ASSISTANT)
+                .role(Role.USER)
                 .content(content)
                 .build();
 

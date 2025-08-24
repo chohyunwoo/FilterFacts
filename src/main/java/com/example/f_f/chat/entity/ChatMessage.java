@@ -28,6 +28,7 @@ public class ChatMessage {
     private Instant createdAt;
 
     @Column(nullable=false, length=20)
+    @Enumerated(EnumType.STRING)
     private Role role; // "USER", "ASSISTANT" 등
 
     @Column(columnDefinition = "text")
