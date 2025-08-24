@@ -322,6 +322,7 @@ public class ChatActivity extends AppCompatActivity {
         return t;
     }
 
+
     // ✅ 대화 목록 호출
     private void fetchConversations(int page, int size) {
         String url = CONVERSATIONS_URL + "?page=" + page + "&size=" + size;
