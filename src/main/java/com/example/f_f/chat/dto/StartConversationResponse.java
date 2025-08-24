@@ -1,14 +1,9 @@
 package com.example.f_f.chat.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.Instant;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class StartConversationResponse {
-    private Long conversationId;
-}
+public record StartConversationResponse (
+        Long id,
+        String title,
+        Instant createdAt
+) {}

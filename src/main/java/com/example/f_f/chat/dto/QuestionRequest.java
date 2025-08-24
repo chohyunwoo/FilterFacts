@@ -8,7 +8,5 @@ import java.util.List;
 @Getter @Setter
 public class QuestionRequest {
     private Long conversationId;
-    private String userId;
     private String question;
-    private List<String> keywords; // 선택
 }

@@ -11,5 +11,4 @@ import java.util.List;
 @AllArgsConstructor
 public class AnswerResponse {
     private String answer;
-    private List<String> keywords;
 }

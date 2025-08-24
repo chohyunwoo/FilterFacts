@@ -14,6 +14,4 @@ public class GrobalExceptionHandler {
         // 서비스에서 throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
     }
-
-    // 필요 시 다른 예외도 추가 가능
 }

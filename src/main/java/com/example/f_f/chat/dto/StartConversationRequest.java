@@ -10,6 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StartConversationRequest {
-    private String userId;
-    private String title; // 선택
+    private String title;
 }
