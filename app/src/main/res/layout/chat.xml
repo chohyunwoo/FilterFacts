@@ -239,38 +239,6 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingBottom="8dp">
-
-                <TextView
-                    android:id="@+id/tvChatsTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/title_chat_list"
-                    android:textStyle="bold"
-                    android:textColor="@color/ai_text"
-                    android:textSize="16sp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnNewChatDrawer"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:paddingHorizontal="10dp"
-                    android:text="@string/btn_new_chat"
-                    android:textAllCaps="false"
-                    android:textColor="@color/ai_text"
-                    app:icon="@drawable/ic_add_24"
-                    app:strokeColor="@color/ai_border" />
-            </LinearLayout>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilSearch"
                 style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
@@ -297,6 +265,31 @@
                 android:clipToPadding="false"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp" />
+
+            <!-- 기존 rvChats 바로 아래에 추가 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogoutDrawer"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAllCaps="false"
+                android:textColor="@color/ai_text"
+                android:text="@string/btn_logout"
+                app:icon="@drawable/ic_logout_24"
+                app:strokeColor="@color/ai_border" />
+
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/btnLogoutAllDrawer"-->
+<!--                style="@style/Widget.Material3.Button.OutlinedButton"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="6dp"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/ai_text"-->
+<!--                android:text="@string/btn_logout_all"-->
+<!--                app:icon="@drawable/ic_logout_24"-->
+<!--                app:strokeColor="@color/ai_border" />-->
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
 

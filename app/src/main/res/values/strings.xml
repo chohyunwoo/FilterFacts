@@ -16,4 +16,6 @@
     <string name="btn_new_chat">새 채팅</string>
     <string name="btn_send">전송</string>
     <string name="hint_question">운동 또는 식단에 대해 물어보세요… (Enter: 전송 / Shift+Enter: 줄바꿈)</string>
+    <string name="btn_logout">로그아웃</string>
+    <string name="btn_logout_all">모든 기기에서 로그아웃</string>
 </resources>
