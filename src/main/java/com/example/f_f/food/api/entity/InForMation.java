@@ -29,4 +29,8 @@ public class InForMation {
     @Column(name = "functionalities", columnDefinition = "TEXT")
     private String mainFnctn;
 
+    // 등록일자
+    @Column(name = "REGIST_DT", columnDefinition = "TEXT")
+    private String registDt;
+
 }
