@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.network.data.request;
 
 public class UserJoinRequest {
     public String userId;

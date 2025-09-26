@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.common;
 
 public class ChatItem {
     public final String text;

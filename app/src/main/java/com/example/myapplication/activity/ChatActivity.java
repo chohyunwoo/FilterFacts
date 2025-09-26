@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.common.ChatItem;
+import com.example.myapplication.adapter.ConversationAdapter;
+import com.example.myapplication.common.ConversationItem;
+import com.example.myapplication.adapter.MessageAdapter;
+import com.example.myapplication.R;
+import com.example.myapplication.common.TokenManager;
+import com.example.myapplication.network.common.ApiClient;
+import com.example.myapplication.network.common.ApiConstants;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,30 +47,12 @@ import okhttp3.Response;
 
 public class ChatActivity extends AppCompatActivity {
 
-    // =========================
-    // 서버 엔드포인트
-    // =========================
-    private static final String CHAT_BASE_URL = "http://10.0.2.2:8080/api/chat";
-    private static final String ASK_URL = CHAT_BASE_URL + "/ask";
-    private static final String CONVERSATIONS_URL = CHAT_BASE_URL + "/conversations";
-
-    private static final String AUTH_BASE_URL = "http://10.0.2.2:8080/api/auth";
-    private static final String REFRESH_URL = AUTH_BASE_URL + "/refresh";
-
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    // ==== 서버 엔드포인트 (기존 아래에 이어서) ====
-    private static final String LOGOUT_URL = AUTH_BASE_URL + "/logout";
-    private static final String LOGOUT_ALL_URL = AUTH_BASE_URL + "/logout-all";
 
-    // ==== UI (드로어 버튼) ====
-    private MaterialButton btnLogoutDrawer;       // 단말 로그아웃
-//    private MaterialButton btnLogoutAllDrawer;    // 전체 로그아웃 (옵션)
+    private ApiClient apiClient;
 
-
-    // =========================
-    // UI
-    // =========================
+    private MaterialButton btnLogoutDrawer;
     private DrawerLayout drawer;
     private RecyclerView rvMessages;
     private TextInputEditText etQuestion;
@@ -79,6 +69,7 @@ public class ChatActivity extends AppCompatActivity {
     // =========================
     private MessageAdapter adapter;
     private ConversationAdapter convAdapter;
+
     private final ArrayList<ConversationItem> convItems = new ArrayList<>();
     private final ArrayList<ChatItem> items = new ArrayList<>();
 
@@ -86,119 +77,24 @@ public class ChatActivity extends AppCompatActivity {
 
     private TokenManager tokenManager;
 
-    // =========================
     // 대화 상태
-    // =========================
     private Long currentConversationId = null;
     private boolean creatingConversation = false;
 
     // 메시지 페이지네이션 상태
-    private static final int MSG_PAGE_SIZE = 50;
+    private static final int MSG_PAGE_SIZE = 10;
     private int msgPage = 0;
     private boolean msgLoading = false;
     private boolean msgHasMore = true;
-    private static final boolean SERVER_RETURNS_DESC = true;
 
 
-    // =========================
-    // 요청 팩토리 & 공통 호출자 (403→refresh→재시도)
-    // =========================
-    @FunctionalInterface
-    private interface RequestFactory {
-        Request build();
-    }
-
-    private void enqueueWithAuth(RequestFactory factory, Callback userCallback) {
-        enqueueWithAuthInternal(factory, userCallback, false);
-    }
-
-    private void enqueueWithAuthInternal(RequestFactory factory, Callback userCallback, boolean alreadyRetried) {
-        Request baseReq = factory.build();
-        String auth = tokenManager.getAuthorizationValue();
-        Request authed = (auth == null || auth.isEmpty())
-                ? baseReq
-                : baseReq.newBuilder().header("Authorization", auth).build();
-
-        http.newCall(authed).enqueue(new Callback() {
-            @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                userCallback.onFailure(call, e);
-            }
-
-            @Override public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.code() == 403 && !alreadyRetried) {
-                    response.close();
-                    attemptRefreshThen(
-                            // 새 토큰으로 원 요청 재시도
-                            () -> enqueueWithAuthInternal(factory, userCallback, true),
-                            // 리프레시 실패
-                            () -> runOnUiThread(() ->
-                                    Toast.makeText(ChatActivity.this, "세션이 만료되었습니다. 다시 로그인해주세요.", Toast.LENGTH_SHORT).show()
-                            )
-                    );
-                } else {
-                    userCallback.onResponse(call, response);
-                }
-            }
-        });
-    }
-
-
-    private void attemptRefreshThen(Runnable onSuccess, Runnable onFail) {
-        String refresh = tokenManager.getRefreshToken();
-        if (refresh == null || refresh.isEmpty()) {
-            onFail.run();
-            return;
-        }
-        try {
-            JSONObject body = new JSONObject();
-            body.put("refreshToken", refresh);
-            RequestBody rb = RequestBody.create(body.toString(), JSON);
-
-            Request refreshReq = new Request.Builder()
-                    .url(REFRESH_URL)
-                    .post(rb)
-                    .build();
-
-            http.newCall(refreshReq).enqueue(new Callback() {
-                @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    onFail.run();
-                }
-
-                @Override public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (!response.isSuccessful() || response.body() == null) {
-                        onFail.run();
-                        return;
-                    }
-                    String respStr = response.body().string();
-                    try {
-                        JSONObject json = new JSONObject(respStr);
-                        String newAccess = json.optString("accessToken", null);
-                        String newRefresh = json.optString("refreshToken", null);
-                        if (newAccess == null || newRefresh == null) {
-                            onFail.run();
-                            return;
-                        }
-                        tokenManager.setAccessToken(newAccess);
-                        tokenManager.setRefreshToken(newRefresh);
-                        onSuccess.run();
-                    } catch (JSONException e) {
-                        onFail.run();
-                    }
-                }
-            });
-        } catch (JSONException e) {
-            onFail.run();
-        }
-    }
-
-    // =========================
     // 라이프사이클
-    // =========================
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat);
 
+        apiClient = new ApiClient(getApplicationContext());
         tokenManager = new TokenManager(getApplicationContext());
 
         drawer = findViewById(R.id.drawerLayout);
@@ -236,12 +132,8 @@ public class ChatActivity extends AppCompatActivity {
         // 로그아웃 버튼들
         btnLogoutDrawer = navigationView.findViewById(R.id.btnLogoutDrawer);
         if (btnLogoutDrawer != null) {
-            btnLogoutDrawer.setOnClickListener(v -> logoutOnce());
+            btnLogoutDrawer.setOnClickListener(v -> logout());
         }
-//        btnLogoutAllDrawer = navigationView.findViewById(R.id.btnLogoutAllDrawer);
-//        if (btnLogoutAllDrawer != null) {
-//            btnLogoutAllDrawer.setOnClickListener(v -> logoutAllDevices());
-//        }
 
         // 카테고리 Chip은 서버 전송 X (UI만)
         categoryChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {});
@@ -288,8 +180,7 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-
-    private void logoutOnce() {
+    private void logout() {
         String refresh = tokenManager.getRefreshToken();
         try {
             JSONObject body = new JSONObject();
@@ -297,49 +188,36 @@ public class ChatActivity extends AppCompatActivity {
             RequestBody rb = RequestBody.create(body.toString(), JSON);
 
             Request req = new Request.Builder()
-                    .url(LOGOUT_URL)
+                    .url(ApiConstants.LOGOUT)
                     .post(rb)
                     .header("Content-Type", "application/json")
                     .build();
 
-            // 1) Call을 만들고
-            Call call = http.newCall(req);
+            // 요청을 보내고
+            http.newCall(req).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    // 네트워크 실패 → 그냥 세션 지우고 로그인으로
+                    runOnUiThread(() -> purgeSessionAndGoLogin());
+                }
 
-            // 2) 즉시 enqueue 해서 Dispatcher 큐에 올린 다음
-            call.enqueue(new Callback() {
-                @Override public void onFailure(@NonNull Call call, @NonNull IOException e) { /* no-op */ }
-                @Override public void onResponse(@NonNull Call call, @NonNull Response response) { /* no-op */ }
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    // 응답이 성공이든 아니든 세션 정리 후 로그인으로 이동
+                    response.close();
+                    runOnUiThread(() -> purgeSessionAndGoLogin());
+                }
             });
 
-            // 3) 바로 화면 전환 (요청은 이미 큐에 올라감)
-            purgeSessionAndGoLogin();
-
         } catch (JSONException ignore) {
+            // JSON 에러 시 그냥 세션 지우고 로그인으로
             purgeSessionAndGoLogin();
         }
     }
 
 
 
-    /** (옵션) 모든 기기에서 로그아웃 */
-//    private void logoutAllDevices() {
-//        // 1) Authorization 헤더가 필요한 요청을 먼저 enqueue
-//        RequestBody empty = RequestBody.create("", JSON);
-//        RequestFactory factory = () -> new Request.Builder()
-//                .url(LOGOUT_ALL_URL)
-//                .post(empty)
-//                .build();
-//
-//        enqueueWithAuth(factory, new Callback() {
-//            @Override public void onFailure(@NonNull Call call, @NonNull IOException e) { /* no-op */ }
-//            @Override public void onResponse(@NonNull Call call, @NonNull Response response) { /* no-op */ }
-//        });
-//
-//        // 2) 곧바로 세션 정리 & 로그인 화면 이동
-//        purgeSessionAndGoLogin();
-//    }
-//
-//
+
     /** 토큰/세션 정리 후 로그인 화면으로 이동 */
     private void purgeSessionAndGoLogin() {
         // accessToken, refreshToken 제거
@@ -393,12 +271,12 @@ public class ChatActivity extends AppCompatActivity {
             bodyJson.put("title", title);
             RequestBody body = RequestBody.create(bodyJson.toString(), JSON);
 
-            RequestFactory factory = () -> new Request.Builder()
-                    .url(CONVERSATIONS_URL)
+            ApiClient.RequestFactory factory = () -> new Request.Builder()
+                    .url(ApiConstants.CONVERSATIONS)
                     .post(body)
                     .build();
 
-            enqueueWithAuth(factory, new Callback() {
+            apiClient.enqueueWithAuth(factory, new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     creatingConversation = false;
@@ -451,12 +329,12 @@ public class ChatActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(bodyJson.toString(), JSON);
 
-            RequestFactory factory = () -> new Request.Builder()
-                    .url(ASK_URL)
+            ApiClient.RequestFactory factory = () -> new Request.Builder()
+                    .url(ApiConstants.ASK)
                     .post(body)
                     .build();
 
-            enqueueWithAuth(factory, new Callback() {
+            apiClient.enqueueWithAuth(factory, new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     Log.e("ChatActivity", "Ask Failed", e);
@@ -507,14 +385,14 @@ public class ChatActivity extends AppCompatActivity {
     // 대화 목록(드로어)
     // =========================
     private void fetchConversations(int page, int size) {
-        String url = CONVERSATIONS_URL + "?page=" + page + "&size=" + size;
+        String url = ApiConstants.CONVERSATIONS + "?page=" + page + "&size=" + size;
 
-        RequestFactory factory = () -> new Request.Builder()
+        ApiClient.RequestFactory factory = () -> new Request.Builder()
                 .url(url)
                 .get()
                 .build();
 
-        enqueueWithAuth(factory, new Callback() {
+        apiClient.enqueueWithAuth(factory, new Callback() {
             @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Log.e("ChatActivity", "Fetch Conversations Failed", e);
                 runOnUiThread(() ->
@@ -578,17 +456,17 @@ public class ChatActivity extends AppCompatActivity {
         if (msgLoading) return;
         msgLoading = true;
 
-        String url = CHAT_BASE_URL + "/messages"
+        String url = ApiConstants.MESSAGES
                 + "?conversationId=" + conversationId
                 + "&page=" + page
                 + "&size=" + MSG_PAGE_SIZE;
 
-        RequestFactory factory = () -> new Request.Builder()
+        ApiClient.RequestFactory factory = () -> new Request.Builder()
                 .url(url)
                 .get()
                 .build();
 
-        enqueueWithAuth(factory, new Callback() {
+        apiClient.enqueueWithAuth(factory, new Callback() {
             @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 msgLoading = false;
                 runOnUiThread(() ->

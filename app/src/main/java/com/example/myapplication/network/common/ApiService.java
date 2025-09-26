@@ -1,9 +1,14 @@
-package com.example.myapplication;
+package com.example.myapplication.network.common;
 
+
+import com.example.myapplication.network.data.request.SendCodeRequest;
+import com.example.myapplication.network.data.request.UserJoinRequest;
+import com.example.myapplication.network.data.request.UserLoginRequest;
+import com.example.myapplication.network.data.response.UserLoginResponse;
+import com.example.myapplication.network.data.request.VerifyCodeRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 public interface ApiService {

@@ -1,20 +1,21 @@
-package com.example.myapplication;
+package com.example.myapplication.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.*;
-
+import com.example.myapplication.R;
+import com.example.myapplication.network.common.ApiClient;
+import com.example.myapplication.network.common.ApiService;
+import com.example.myapplication.network.data.request.SendCodeRequest;
+import com.example.myapplication.network.data.request.UserJoinRequest;
+import com.example.myapplication.network.data.request.VerifyCodeRequest;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.*;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -24,13 +25,11 @@ public class RegisterActivity extends AppCompatActivity {
     private Button sendCodeButton, resendCodeButton, verifyCodeButton, registerButton;
     private TextView statusTextView;
 
-    private static final String BASE_URL = "http://10.0.2.2:8080/"; // 에뮬레이터 → 로컬호스트
-
-    private Gson gson;
     private ApiService apiService;
+    private Gson gson;
 
     private boolean emailVerified = false;
-    private String lastEmail = null; // 인증 성공한 이메일 보관
+    private String lastEmail = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +37,11 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         bindViews();
-        setupRetrofit();
+
+        // ✅ ApiClient로 Retrofit 가져오기
+        ApiClient apiClient = new ApiClient(getApplicationContext());
+        apiService = apiClient.getRetrofit().create(ApiService.class);
+
         setupListeners();
     }
 
@@ -56,23 +59,9 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setEnabled(false); // 인증 전 비활성화
     }
 
-    private void setupRetrofit() {
-        gson = new GsonBuilder().setLenient().create();
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(msg -> Log.d("OkHttp", msg));
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logging).build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(client)
-                .build();
-        apiService = retrofit.create(ApiService.class);
-    }
-
     private void setupListeners() {
         sendCodeButton.setOnClickListener(v -> sendCode(false));
         resendCodeButton.setOnClickListener(v -> sendCode(true));
-
         verifyCodeButton.setOnClickListener(v -> verifyCode());
 
         registerButton.setOnClickListener(v -> {
@@ -87,23 +76,24 @@ public class RegisterActivity extends AppCompatActivity {
                 setStatus("아이디/비밀번호를 모두 입력해주세요.");
                 return;
             }
-            // 서버 @Size(min=6) 기준 맞춤
             if (password.length() < 6) {
                 setStatus("비밀번호는 6자 이상이어야 합니다.");
                 return;
             }
 
-            System.out.println("lastEmail = " + lastEmail);
             UserJoinRequest body = new UserJoinRequest(userId, password, lastEmail);
-            log("회원가입 요청: " + gson.toJson(body));
+            log("회원가입 요청: " + body);
 
             apiService.register(body).enqueue(new Callback<Void>() {
                 @Override public void onResponse(Call<Void> call, Response<Void> resp) {
                     if (resp.isSuccessful()) {
-                        // 201 Created 기대
                         setStatus("회원가입 성공!");
                         toast("회원가입 성공");
-                        // finish(); // 필요 시 화면 닫기
+
+                        // 로그인 화면으로 이동
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
                     } else if (resp.code() == 409) {
                         setStatus("이미 존재하는 아이디입니다.");
                     } else {
@@ -123,10 +113,10 @@ public class RegisterActivity extends AppCompatActivity {
             setStatus("이메일을 입력해주세요.");
             return;
         }
+
         SendCodeRequest body = new SendCodeRequest(email, "signup");
         apiService.sendCode(body).enqueue(new Callback<ResponseBody>() {
             @Override public void onResponse(Call<ResponseBody> call, Response<ResponseBody> resp) {
-                System.out.println("resp.code() = " + resp.code());
                 if (resp.isSuccessful()) {
                     setStatus(resend ? "인증코드가 재전송되었습니다." : "인증코드가 전송되었습니다.");
                     toast("인증코드 전송");
@@ -135,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
             @Override public void onFailure(Call<ResponseBody> call, Throwable t) {
-                setStatus("네트워크 오류: sendCode" + t.getMessage());
+                setStatus("네트워크 오류: sendCode " + t.getMessage());
             }
         });
     }
@@ -159,7 +149,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (resp.isSuccessful()) {
                     emailVerified = true;
                     lastEmail = email;
-                    registerButton.setEnabled(true); // ✅ 인증 완료되면 가입 버튼 활성화
+                    registerButton.setEnabled(true);
                     setStatus("이메일 인증 완료! 이제 가입할 수 있어요.");
                     toast("이메일 인증 성공");
                 } else {

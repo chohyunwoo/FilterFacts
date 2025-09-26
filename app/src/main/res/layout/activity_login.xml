@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    tools:context=".LoginActivity">
+    tools:context=".activity.LoginActivity">
 
     <TextView
         android:id="@+id/textViewLoginTitle"
