@@ -29,6 +29,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,7 +57,8 @@ public class ChatActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     private RecyclerView rvMessages;
     private TextInputEditText etQuestion;
-    private MaterialButton btnSend, btnNewChat;
+    private TextInputLayout btnSend;
+    private MaterialButton btnNewChat;
     private FloatingActionButton fabToBottom;
     private ChipGroup categoryChipGroup;
 
@@ -102,10 +104,11 @@ public class ChatActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> drawer.openDrawer(GravityCompat.START));
 
+
         // 메인 채팅 뷰
         rvMessages = findViewById(R.id.rvMessages);
         etQuestion = findViewById(R.id.etQuestion);
-        btnSend = findViewById(R.id.btnSend);
+        btnSend = findViewById(R.id.tilQuestion);
         btnNewChat = findViewById(R.id.btnNewChat);
         fabToBottom = findViewById(R.id.fabToBottom);
         categoryChipGroup = findViewById(R.id.categoryChipGroup);
@@ -124,7 +127,6 @@ public class ChatActivity extends AppCompatActivity {
             currentConversationId = item.getId();
             resetMessagePaging();
             openConversationAndLoadFirstPage(currentConversationId);
-            Toast.makeText(this, "대화 전환: " + item.getTitle(), Toast.LENGTH_SHORT).show();
             drawer.closeDrawer(GravityCompat.START);
         });
         rvChats.setAdapter(convAdapter);
@@ -153,7 +155,7 @@ public class ChatActivity extends AppCompatActivity {
 
         fabToBottom.setOnClickListener(v -> rvMessages.scrollToPosition(adapter.getItemCount() - 1));
 
-        btnSend.setOnClickListener(v -> sendCurrentText());
+        btnSend.setEndIconOnClickListener(v -> sendCurrentText());
         etQuestion.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 sendCurrentText();
@@ -166,7 +168,6 @@ public class ChatActivity extends AppCompatActivity {
             adapter.clear();
             currentConversationId = null;
             creatingConversation = false;
-            Toast.makeText(this, "새 대화를 시작합니다. 첫 질문 시 채팅방이 생성됩니다.", Toast.LENGTH_SHORT).show();
         });
 
         // 드로어 열릴 때 목록 갱신

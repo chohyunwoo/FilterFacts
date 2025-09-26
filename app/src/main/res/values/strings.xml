@@ -10,7 +10,7 @@
     <string name="content_desc_scroll_bottom">맨 아래로 이동</string>
     <string name="title_chat_list">채팅 목록</string>
     <string name="hint_search">대화 검색 (제목)</string>
-    <string name="title_ai_coach">AI 식단·운동 코치</string>
+    <string name="title_ai_coach">F&amp;F</string>
     <string name="empty_title">안녕하세요! AI 코치입니다</string>
     <string name="empty_desc">운동 계획, 식단 구성, 회복 전략 등 무엇이든 질문해 보세요.</string>
     <string name="btn_new_chat">새 채팅</string>
