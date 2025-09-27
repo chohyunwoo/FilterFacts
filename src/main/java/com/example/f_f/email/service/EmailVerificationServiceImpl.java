@@ -1,7 +1,7 @@
 package com.example.f_f.email.service;
 
-import com.example.f_f.global.exception.EmailNotVerifiedException;
-import com.example.f_f.global.exception.InvalidVerificationCodeException;
+import com.example.f_f.global.exception.CustomException;
+import com.example.f_f.global.exception.RsCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
@@ -44,7 +44,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     public void verifyAndMarkAsVerified(String email, String purpose, String code) {
         String saved = redis.opsForValue().get(codeKey(email, purpose));
         if (saved == null || !saved.equals(code)) {
-            throw new InvalidVerificationCodeException("인증 코드가 올바르지 않거나 만료되었습니다.");
+            throw new CustomException(RsCode.INVALID_VERIFICATION_CODE);
         }
         // 사용 후 즉시 코드 삭제
         redis.delete(codeKey(email, purpose));
@@ -57,7 +57,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     public void ensureVerified(String email, String purpose) {
         String v = redis.opsForValue().get(verifiedKey(email, purpose));
         if (v == null) {
-            throw new EmailNotVerifiedException(email, "signup");
+            throw new CustomException(RsCode.EMAIL_VERIFICATION_FAILED);
         }
         // 사용 직후 바로 지워 ‘일회성’으로 만들고 싶으면 아래 주석 해제
          redis.delete(verifiedKey(email, purpose));

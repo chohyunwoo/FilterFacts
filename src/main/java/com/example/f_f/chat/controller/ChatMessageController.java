@@ -1,6 +1,6 @@
 package com.example.f_f.chat.controller;
 
-import com.example.f_f.chat.dto.AnswerResponse;
+import com.example.f_f.ai.dto.AnswerResponse;
 import com.example.f_f.chat.dto.ChatMessageDto;
 import com.example.f_f.chat.dto.QuestionRequest;
 import com.example.f_f.chat.service.ChatMessageService;

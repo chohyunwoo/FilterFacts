@@ -3,9 +3,8 @@ package com.example.f_f.chat.service;
 import com.example.f_f.chat.dto.StartConversationResponse;
 import com.example.f_f.chat.entity.Conversation;
 import com.example.f_f.chat.repository.ConversationRepository;
-import com.example.f_f.global.exception.ConversationForbiddenException;
-import com.example.f_f.global.exception.ConversationNotFoundException;
-import com.example.f_f.global.exception.UserNotFoundException;
+import com.example.f_f.global.exception.CustomException;
+import com.example.f_f.global.exception.RsCode;
 import com.example.f_f.user.entity.User;
 import com.example.f_f.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -27,7 +26,7 @@ public class ConversationService {
     public Conversation startConversation(String userId, String title) {
         // 존재하는 회원인지 검증
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new CustomException(RsCode.USER_NOT_FOUND));
 
         Conversation c = Conversation.builder()
                 .user(user)
@@ -45,9 +44,9 @@ public class ConversationService {
     /** 소유 검증 포함 조회(메시지 서비스에서 사용) */
     public Conversation getOwnedConversation(String userId, Long conversationId) {
         Conversation conv = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new ConversationNotFoundException(conversationId));
+                .orElseThrow(() -> new CustomException(RsCode.CHATROOM_NOT_FOUND));
         if (!conv.getUser().getUserId().equals(userId)) {
-            throw new ConversationForbiddenException(conversationId);
+            throw new CustomException(RsCode.FORBIDDEN);
         }
         return conv;
     }

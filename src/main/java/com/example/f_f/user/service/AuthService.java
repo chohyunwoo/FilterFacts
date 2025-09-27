@@ -1,8 +1,8 @@
 package com.example.f_f.user.service;
 
 import com.example.f_f.email.service.EmailVerificationService;
-import com.example.f_f.global.exception.DuplicateUserIdException;
-import com.example.f_f.global.exception.InvalidRefreshTokenException;
+import com.example.f_f.global.exception.CustomException;
+import com.example.f_f.global.exception.RsCode;
 import com.example.f_f.user.dto.*;
 import com.example.f_f.user.entity.User;
 import com.example.f_f.user.jwt.JwtService;
@@ -29,7 +29,7 @@ public class AuthService {
     public String register(RegisterRequest req) {
         // userId 중복 확인
         if (users.existsByUserId(req.userId())) {
-            throw new DuplicateUserIdException(req.userId());
+            throw new CustomException(RsCode.DUPLICATE_USER_ID);
         }
 
         // 이메일 인증 선확인
@@ -64,12 +64,12 @@ public class AuthService {
     public TokenResponse refresh(RefreshRequest req) {
         String refresh = req.refreshToken();
         if (!jwt.isTokenValid(refresh) || !jwt.isRefresh(refresh)) {
-            throw new InvalidRefreshTokenException();
+            throw new CustomException(RsCode.INVALID_REFRESH_TOKEN);
         }
 
         String username = jwt.getUsername(refresh);
         if (!store.isRefreshValid(username, refresh)) {
-            throw new InvalidRefreshTokenException();
+            throw new CustomException(RsCode.INVALID_REFRESH_TOKEN);
         }
 
         store.revokeRefresh(username, refresh);
@@ -90,7 +90,7 @@ public class AuthService {
     public void logout(LogoutRequest req) {
         String refresh = req.refreshToken();
         if (!jwt.isTokenValid(refresh) || !jwt.isRefresh(refresh)) {
-            throw new InvalidRefreshTokenException();
+            throw new CustomException(RsCode.INVALID_REFRESH_TOKEN);
         }
         String username = jwt.getUsername(refresh);
         store.revokeRefresh(username, refresh);
