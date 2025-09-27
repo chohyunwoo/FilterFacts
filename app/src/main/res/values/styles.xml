@@ -1,0 +1,13 @@
+<resources>
+    <!-- 기본 앱 테마 -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 기본 색상들 -->
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/ai_brand</item>
+
+        <!-- 상태바/내비게이션바 색상 -->
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
+</resources>

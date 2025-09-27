@@ -5,19 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="#0B0F19">
+    android:background="#000000">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- 상단 앱바 -->
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@drawable/bg_glass_bar"
+            android:background="#000000"
             android:fitsSystemWindows="true"
             app:elevation="6dp">
 
@@ -29,8 +28,9 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 app:title="@string/title_ai_coach"
-                android:titleTextColor="@color/ai_text"
+                android:titleTextColor="@android:color/white"
                 app:navigationIcon="@drawable/ic_menu_24"
+                app:navigationIconTint="@android:color/white"
                 app:titleCentered="false" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -38,10 +38,10 @@
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#000000"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:paddingTop="?attr/actionBarSize">
 
-            <!-- 채팅 메시지 영역 -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvMessages"
                 android:layout_width="0dp"
@@ -53,13 +53,13 @@
                 android:paddingBottom="140dp"
                 android:fadingEdgeLength="8dp"
                 android:requiresFadingEdge="vertical"
+                android:background="#000000"
                 app:layout_constrainedHeight="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/inputCard"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- ✅ 새 채팅 + 카테고리 선택란 -->
             <LinearLayout
                 android:id="@+id/topActionRow"
                 android:layout_width="0dp"
@@ -72,7 +72,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- 새 채팅 버튼 -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNewChat"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -81,12 +80,12 @@
                     android:layout_marginEnd="8dp"
                     android:text="@string/btn_new_chat"
                     android:textAllCaps="false"
-                    android:textColor="@color/ai_text"
+                    android:textColor="@android:color/white"
                     app:icon="@drawable/ic_add_24"
                     app:iconGravity="textStart"
+                    app:iconTint="@android:color/white"
                     app:strokeColor="@color/ai_border" />
 
-                <!-- 식품/화장품 ChipGroup -->
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/categoryChipGroup"
                     android:layout_width="wrap_content"
@@ -101,7 +100,10 @@
                         android:layout_height="wrap_content"
                         android:text="식품"
                         android:checked="true"
-                        android:textColor="@color/ai_text"/>
+                        app:chipBackgroundColor="@color/chip_background_color"
+                        android:textColor="@android:color/white"
+                        app:checkedIconTint="@android:color/white"/>
+
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipCosmetics"
@@ -109,17 +111,20 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="화장품"
-                        android:textColor="@color/ai_text"/>
+                        app:chipBackgroundColor="@color/chip_background_color"
+                        android:textColor="@android:color/white"
+                        app:checkedIconTint="@android:color/white"/>
+
+
                 </com.google.android.material.chip.ChipGroup>
             </LinearLayout>
 
-            <!-- ✅ 입력창: 가로 전체 -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/inputCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                app:cardBackgroundColor="@color/ai_panel"
+                app:cardBackgroundColor="#1E1E1E"
                 app:strokeColor="@color/ai_border"
                 app:strokeWidth="1dp"
                 app:cardCornerRadius="12dp"
@@ -133,12 +138,12 @@
                     style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxBackgroundColor="@color/ai_glass"
+                    app:boxBackgroundColor="#1E1E1E"
                     app:boxStrokeColor="@color/ai_border"
                     app:hintEnabled="false"
                     app:endIconDrawable="@drawable/ic_send_24"
                     app:endIconMode="custom"
-                    app:endIconTint="@color/ai_text">
+                    app:endIconTint="@android:color/white">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etQuestion"
@@ -148,12 +153,11 @@
                         android:hint="@string/hint_question"
                         android:maxLines="5"
                         android:minLines="1"
-                        android:textColor="@color/ai_text"
+                        android:textColor="@android:color/white"
                         android:textColorHint="@color/ai_muted" />
                 </com.google.android.material.textfield.TextInputLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 맨 아래로 이동 버튼 -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabToBottom"
                 android:layout_width="wrap_content"
@@ -167,19 +171,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:srcCompat="@drawable/ic_arrow_down_24"
                 app:tint="@android:color/white" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <!-- 네비게이션 드로어 -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
-        android:layout_width="320dp"
+        android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="#000000"
         android:fitsSystemWindows="true"
-        app:itemIconTint="@color/ai_text"
-        app:itemTextColor="@color/ai_text"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
         app:menu="@menu/menu_empty">
 
         <LinearLayout
@@ -204,11 +207,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAllCaps="false"
-                android:textColor="@color/ai_text"
+                android:textColor="@android:color/white"
                 android:text="@string/btn_logout"
                 app:icon="@drawable/ic_logout_24"
+                app:iconTint="@android:color/white"
                 app:strokeColor="@color/ai_border" />
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
-
 </androidx.drawerlayout.widget.DrawerLayout>

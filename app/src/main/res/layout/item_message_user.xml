@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:padding="6dp">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="end"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
     <TextView
         android:id="@+id/tvMsg"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:maxWidth="320dp"
-        android:padding="12dp"
-        android:textColor="#0B0F19"
-        android:background="@android:color/white"
-        android:elevation="2dp"/>
-</FrameLayout>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_bubble_user"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"/>
+</LinearLayout>

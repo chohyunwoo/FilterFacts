@@ -1,6 +1,8 @@
 package com.example.myapplication.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -100,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
         tokenManager = new TokenManager(getApplicationContext());
 
         drawer = findViewById(R.id.drawerLayout);
+        drawer.setBackgroundColor(Color.parseColor("#0B0F19"));
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> drawer.openDrawer(GravityCompat.START));
@@ -170,12 +173,21 @@ public class ChatActivity extends AppCompatActivity {
             creatingConversation = false;
         });
 
-        // 드로어 열릴 때 목록 갱신
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
                 if (drawerView.getId() == R.id.navigationView) {
                     fetchConversations(0, 50);
+                }
+                // 드로어 열렸을 때 → 회색 오버레이
+                drawer.setScrimColor(Color.parseColor("#99000000"));
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                if (drawerView.getId() == R.id.navigationView) {
+                    // 드로어 닫혔을 때 → 검정 배경 복원
+                    drawer.setBackgroundColor(Color.parseColor("#0B0F19"));
                 }
             }
         });

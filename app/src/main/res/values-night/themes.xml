@@ -1,7 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- 상태바/내비게이션 색상 (다크 모드일 때도 동일하게 적용) -->
+        <item name="android:statusBarColor">#121212</item>
+        <item name="android:navigationBarColor">#121212</item>
+
+        <!-- 아이콘 흰색 -->
+        <item name="android:windowLightStatusBar">false</item>
     </style>
+
+    <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
 </resources>
