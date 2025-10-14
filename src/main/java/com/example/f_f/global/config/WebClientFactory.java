@@ -34,17 +34,17 @@ public class WebClientFactory {
                 .build();
     }
 
-    @Bean
-    public WebClient fastApiClient(
-            @Value("${fastapi.base-url}") String baseUrl
-    ) {
-        return WebClient.builder()
-                .baseUrl(baseUrl)
-                .exchangeStrategies(
-                        ExchangeStrategies.builder()
-                                .codecs(c -> c.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
-                                .build()
-                )
-                .build();
-    }
+//    @Bean
+//    public WebClient fastApiClient(
+//            @Value("${fastapi.base-url}") String baseUrl
+//    ) {
+//        return WebClient.builder()
+//                .baseUrl(baseUrl)
+//                .exchangeStrategies(
+//                        ExchangeStrategies.builder()
+//                                .codecs(c -> c.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+//                                .build()
+//                )
+//                .build();
+//    }
 }

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build: .
@@ -11,11 +9,27 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/TestDb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 3684
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      FASTAPI_BASE_URL: http://fastapi:8000
+      FASTAPI_ASK_PATH: /api/ask
+
+      JWT_SECRET: U2VjdXJlS2V5MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMw==
+      JWT_ACCESS_EXP_MS: 1800000
+      JWT_REFRESH_EXP_MS: 1209600000
+
+      MAIL_USERNAME: brian7536curry@gmail.com
+      MAIL_PASSWORD: zgvk qfdr btzx slee
+      AI_MOCK: true
     depends_on:
       - db
+      - redis
+#      - fastapi
 
   db:
-    image: postgres:15
+    image: postgres:17
     container_name: postgres-db
     environment:
       POSTGRES_DB: TestDb
@@ -23,3 +37,20 @@ services:
       POSTGRES_PASSWORD: 3684
     ports:
       - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+networks:
+  default:
+    name: filterfacts_network
+
+
+#  fastapi:
+#    build: ./fastapi
+#    container_name: fastapi
+#    ports:
+#      - "8000:8000"
