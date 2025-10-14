@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: f-f-backend
-          image: ncr.io/contest-cluster54-registry/f-f-backend:latest
+          image: contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
           ports:
             - containerPort: 8080
 ---
