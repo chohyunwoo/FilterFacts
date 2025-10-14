@@ -1,0 +1,42 @@
+name: Deploy FilterFacts to Naver Cloud Kubernetes
+
+on:
+  push:
+    branches:
+      - merge
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ 저장소 코드 체크아웃
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      # 2️⃣ Docker 로그인 (Naver Cloud Container Registry)
+      - name: Login to Naver Cloud Container Registry
+        run: |
+          echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login -u "${{ secrets.NCP_REGISTRY_USERNAME }}" --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
+
+      # 3️⃣ Docker 이미지 빌드
+      - name: Build Docker image
+        run: |
+          docker build -t contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest .
+
+      # 4️⃣ NCR로 푸시
+      - name: Push Docker image
+        run: |
+          docker push contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
+
+      # 5️⃣ 쿠버네티스 클러스터 인증 설정
+      - name: Set up kubeconfig for NKS
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.NKS_KUBECONFIG1 }}" | base64 --decode > $HOME/.kube/config
+
+      # 6️⃣ Kubernetes 배포
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f deployment.yaml
+
