@@ -56,13 +56,11 @@ jobs:
       - name: Configure Naver Cloud credentials
         run: |
           mkdir -p $HOME/.ncloud
-          cat <<EOF > $HOME/.ncloud/configure
-[ncloud]
-ncloud_access_key_id = "${{ secrets.NCP_ACCESS_KEY }}"
-ncloud_secret_access_key = "${{ secrets.NCP_SECRET_KEY }}"
-ncloud_api_url = https://ncloud.apigw.ntruss.com
-EOF
-
+          echo "[ncloud]" > $HOME/.ncloud/configure
+          echo "ncloud_access_key_id = \"${{ secrets.NCP_ACCESS_KEY }}\"" >> $HOME/.ncloud/configure
+          echo "ncloud_secret_access_key = \"${{ secrets.NCP_SECRET_KEY }}\"" >> $HOME/.ncloud/configure
+          echo "ncloud_api_url = https://ncloud.apigw.ntruss.com" >> $HOME/.ncloud/configure
+          
       # 9️⃣ ✅ kubeconfig 복원
       - name: Set up kubeconfig for NKS
         run: |
