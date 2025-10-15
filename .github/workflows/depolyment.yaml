@@ -52,7 +52,8 @@ jobs:
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
 
-      # 8️⃣ ✅ Naver Cloud Access/Secret Key 구성
+  
+ # 8️⃣ Naver Cloud Access/Secret Key 파일 생성 (로컬 ~/.ncloud/configure 재현)
       - name: Configure Naver Cloud credentials
         run: |
           mkdir -p $HOME/.ncloud
@@ -60,6 +61,7 @@ jobs:
           echo "ncloud_access_key_id = ${NCP_ACCESS_KEY}" >> $HOME/.ncloud/configure
           echo "ncloud_secret_access_key = ${NCP_SECRET_KEY}" >> $HOME/.ncloud/configure
           echo "ncloud_api_url = https://ncloud.apigw.ntruss.com" >> $HOME/.ncloud/configure
+          echo "✅ ~/.ncloud/configure 생성 완료"
         env:
           NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
           NCP_SECRET_KEY: ${{ secrets.NCP_SECRET_KEY }}
