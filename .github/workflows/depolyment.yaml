@@ -57,9 +57,12 @@ jobs:
         run: |
           mkdir -p $HOME/.ncloud
           echo "[ncloud]" > $HOME/.ncloud/configure
-          echo "ncloud_access_key_id = \"${{ secrets.NCP_ACCESS_KEY }}\"" >> $HOME/.ncloud/configure
-          echo "ncloud_secret_access_key = \"${{ secrets.NCP_SECRET_KEY }}\"" >> $HOME/.ncloud/configure
+          echo "ncloud_access_key_id = ${NCP_ACCESS_KEY}" >> $HOME/.ncloud/configure
+          echo "ncloud_secret_access_key = ${NCP_SECRET_KEY}" >> $HOME/.ncloud/configure
           echo "ncloud_api_url = https://ncloud.apigw.ntruss.com" >> $HOME/.ncloud/configure
+        env:
+          NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
+          NCP_SECRET_KEY: ${{ secrets.NCP_SECRET_KEY }}
           
       # 9️⃣ ✅ kubeconfig 복원
       - name: Set up kubeconfig for NKS
