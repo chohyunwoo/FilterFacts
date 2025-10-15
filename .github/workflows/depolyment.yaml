@@ -1,4 +1,4 @@
-  name: Deploy FilterFacts to Naver Cloud Kubernetes
+name: Deploy FilterFacts to Naver Cloud Kubernetes
 
 on:
   push:
