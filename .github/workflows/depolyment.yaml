@@ -66,6 +66,12 @@ jobs:
           NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
           NCP_SECRET_KEY: ${{ secrets.NCP_SECRET_KEY }}
           
+      - name: Debug ncloud configure file
+        run: |
+          echo "----- ~/.ncloud/configure 내용 확인 -----"
+          cat $HOME/.ncloud/configure
+          
+          
       # 9️⃣ ✅ kubeconfig 복원
       - name: Set up kubeconfig for NKS
         run: |
