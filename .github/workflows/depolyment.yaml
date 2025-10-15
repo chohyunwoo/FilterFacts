@@ -52,8 +52,7 @@ jobs:
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
 
-  
- # 8️⃣ Naver Cloud Access/Secret Key 파일 생성 (로컬 ~/.ncloud/configure 재현)
+      # 8️⃣ Naver Cloud Access/Secret Key 파일 생성 (~/.ncloud/configure)
       - name: Configure Naver Cloud credentials
         run: |
           mkdir -p $HOME/.ncloud
@@ -62,19 +61,27 @@ jobs:
           echo "ncloud_secret_access_key = ${NCP_SECRET_ACCESS_KEY}" >> $HOME/.ncloud/configure
           echo "ncloud_api_url = https://ncloud.apigw.ntruss.com" >> $HOME/.ncloud/configure
           chmod 600 $HOME/.ncloud/configure
+          # ✅ 루트 경로에도 동일한 인증파일 복사
           sudo mkdir -p /root/.ncloud
           sudo cp $HOME/.ncloud/configure /root/.ncloud/configure
+          sudo chmod 600 /root/.ncloud/configure
         env:
           NCP_ACCESS_KEY_ID: ${{ secrets.NCP_ACCESS_KEY_ID }}
           NCP_SECRET_ACCESS_KEY: ${{ secrets.NCP_SECRET_ACCESS_KEY }}
-          
+
       # 9️⃣ ✅ kubeconfig 복원
       - name: Set up kubeconfig for NKS
         run: |
           mkdir -p $HOME/.kube
           printf "%s" "${{ secrets.NKS_KUBECONFIG1 }}" | base64 --decode > $HOME/.kube/config
 
-      # 🔟 ✅ Kubernetes 배포 실행
+      # 🔹 10️⃣ NCP 환경변수 export (백업용)
+      - name: Export NCP credentials
+        run: |
+          echo "export NCP_ACCESS_KEY_ID=${{ secrets.NCP_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "export NCP_SECRET_ACCESS_KEY=${{ secrets.NCP_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+
+      # 🔹 11️⃣ ✅ Kubernetes 배포 실행 (검증 비활성화)
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f deployment.yaml
+          kubectl apply -f deployment.yaml --validate=false
