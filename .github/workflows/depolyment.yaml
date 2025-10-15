@@ -1,4 +1,4 @@
-name: Deploy FilterFacts to Naver Cloud Kubernetes
+  name: Deploy FilterFacts to Naver Cloud Kubernetes
 
 on:
   push:
@@ -58,19 +58,15 @@ jobs:
         run: |
           mkdir -p $HOME/.ncloud
           echo "[ncloud]" > $HOME/.ncloud/configure
-          echo "ncloud_access_key_id = ${NCP_ACCESS_KEY}" >> $HOME/.ncloud/configure
-          echo "ncloud_secret_access_key = ${NCP_SECRET_KEY}" >> $HOME/.ncloud/configure
+          echo "ncloud_access_key_id = ${NCP_ACCESS_KEY_ID}" >> $HOME/.ncloud/configure
+          echo "ncloud_secret_access_key = ${NCP_SECRET_ACCESS_KEY}" >> $HOME/.ncloud/configure
           echo "ncloud_api_url = https://ncloud.apigw.ntruss.com" >> $HOME/.ncloud/configure
-          echo "✅ ~/.ncloud/configure 생성 완료"
+          chmod 600 $HOME/.ncloud/configure
+          sudo mkdir -p /root/.ncloud
+          sudo cp $HOME/.ncloud/configure /root/.ncloud/configure
         env:
-          NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
-          NCP_SECRET_KEY: ${{ secrets.NCP_SECRET_KEY }}
-          
-      - name: Debug ncloud configure file
-        run: |
-          echo "----- ~/.ncloud/configure 내용 확인 -----"
-          cat $HOME/.ncloud/configure
-          
+          NCP_ACCESS_KEY_ID: ${{ secrets.NCP_ACCESS_KEY_ID }}
+          NCP_SECRET_ACCESS_KEY: ${{ secrets.NCP_SECRET_ACCESS_KEY }}
           
       # 9️⃣ ✅ kubeconfig 복원
       - name: Set up kubeconfig for NKS
