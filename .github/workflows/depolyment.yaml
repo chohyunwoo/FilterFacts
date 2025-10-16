@@ -47,10 +47,17 @@ jobs:
       # 7️⃣ ✅ Naver Cloud IAM Authenticator 설치
       - name: Install Naver Cloud IAM Authenticator
         run: |
-          curl -L -o ncp-iam-authenticator \
-           https://github.com/NaverCloudPlatform/ncp-iam-authenticator/releases/download/v1.0.11/ncp-iam-authenticator_linux_amd64
+          echo "Downloading ncp-iam-authenticator..."
+          curl -fL -o ncp-iam-authenticator \
+            https://github.com/NaverCloudPlatform/ncp-iam-authenticator/releases/download/v1.0.11/ncp-iam-authenticator_linux_amd64
+          
+          # 다운로드 확인
+          file ncp-iam-authenticator
+          ls -lh ncp-iam-authenticator
+          
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
+
 
       # 8️⃣ ✅ Naver Cloud Access/Secret Key 파일 생성 (~/.ncloud/configure)
       - name: Configure Naver Cloud credentials
