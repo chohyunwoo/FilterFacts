@@ -104,7 +104,7 @@ jobs:
       # 11️⃣ ✅ Kubernetes 배포 실행 (Inline ENV 주입 방식)
       - name: Apply Kubernetes manifests
         run: |
-          echo "🔑 Starting deploy with inline credentials..."
-          NCP_ACCESS_KEY_ID=${{ secrets.NCP_ACCESS_KEY_ID }} \
-          NCP_SECRET_ACCESS_KEY=${{ secrets.NCP_SECRET_ACCESS_KEY }} \
+          export NCP_ACCESS_KEY_ID=$(grep ncloud_access_key_id $HOME/.ncloud/configure | awk -F'= ' '{print $2}')
+          export NCP_SECRET_ACCESS_KEY=$(grep ncloud_secret_access_key $HOME/.ncloud/configure | awk -F'= ' '{print $2}')
           kubectl apply -f deployment.yaml --validate=false
+
