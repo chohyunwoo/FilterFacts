@@ -3,7 +3,7 @@ name: Deploy FilterFacts to Naver Cloud Kubernetes
 on:
   push:
     branches:
-      - main  # main 브랜치에 push 될 때 자동 배포
+      - deploy  # deploy 브랜치에 push 될 때 자동 배포
 
 jobs:
   build-and-deploy:
