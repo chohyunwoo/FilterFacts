@@ -101,6 +101,19 @@ jobs:
           echo "ncp-iam-authenticator file type:"
           file /usr/local/bin/ncp-iam-authenticator
 
+      - name: Check NCP keys
+        run: |
+          echo "NCP_ACCESS_KEY_ID: $NCP_ACCESS_KEY_ID"
+          echo "NCP_SECRET_ACCESS_KEY: $NCP_SECRET_ACCESS_KEY"
+        env:
+          NCP_ACCESS_KEY_ID: ${{ secrets.NCP_ACCESS_KEY_ID }}
+          NCP_SECRET_ACCESS_KEY: ${{ secrets.NCP_SECRET_ACCESS_KEY }}
+
+
+      - name: Show configure file
+        run: cat $HOME/.ncloud/configure
+
+
       # 11️⃣ ✅ Kubernetes 배포 실행 (Inline ENV 주입 방식)
       - name: Apply Kubernetes manifests
         run: |
