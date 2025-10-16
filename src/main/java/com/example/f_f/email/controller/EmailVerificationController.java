@@ -17,16 +17,12 @@ public class EmailVerificationController {
         this.service = service;
     }
 
-    // 이메일 인증 코드 전송
     @PostMapping
     public ResponseEntity<String> send(@RequestBody @Valid SendCodeRequest req) {
-        System.out.println("req.email() = " + req.email());
-        System.out.println("req.purpose() = " + req.purpose());
         service.sendVerificationCode(req.email(), req.purpose());
         return ResponseEntity.ok("인증 코드가 전송되었습니다.");
     }
 
-    // 이메일 인증 코드 검증
     @PostMapping("/verify")
     public ResponseEntity<String> verify(@RequestBody @Valid VerifyCodeRequest req) {
         service.verifyAndMarkAsVerified(req.email(), req.purpose(), req.code());

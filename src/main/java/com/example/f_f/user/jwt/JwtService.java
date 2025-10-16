@@ -54,7 +54,7 @@ public class JwtService {
         try {
             parse(token);
             return true;
-        } catch (IllegalArgumentException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
@@ -62,7 +62,7 @@ public class JwtService {
     public boolean isRefresh(String token) {
         try {
             return "refresh".equals(parse(token).getBody().get("typ"));
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }

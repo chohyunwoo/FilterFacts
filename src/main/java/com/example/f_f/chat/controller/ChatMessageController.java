@@ -18,10 +18,11 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
 
     @GetMapping("/messages")
-    public ResponseEntity<Page<ChatMessageDto>> listMessages(@RequestParam Long conversationId,
+    public ResponseEntity<Page<ChatMessageDto>> listMessages(Authentication auth,
+                                             @RequestParam Long conversationId,
                                              @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "50") int size) {
-        return ResponseEntity.ok(chatMessageService.listMessages(conversationId, page, size));
+                                             @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(chatMessageService.listMessages(auth.getName(), conversationId, page, size));
     }
 
     /** 안드로이드: 질문 → (AI)응답 한 번에 */
