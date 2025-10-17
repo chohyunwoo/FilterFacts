@@ -1,32 +1,63 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: f-f-backend
+name: Deploy FilterFacts to Naver Cloud Kubernetes
 
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: f-f-backend
-  template:
-    metadata:
-      labels:
-        app: f-f-backend
-    spec:
-      containers:
-        - name: f-f-backend
-          image: contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
-          ports:
-            - containerPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: f-f-backend
-  ports:
-    - port: 80
-      targetPort: 8080
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Login to Naver Cloud Container Registry
+        run: |
+          echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
+            -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
+            --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
+
+      - name: Build Docker image
+        run: |
+          docker build -t contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
+
+      # ✅ ncp-iam-authenticator 제거됨
+
+      # ✅ ServiceAccount 기반 kubeconfig 복원
+      - name: Set up kubeconfig for NKS (ServiceAccount 방식)
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.NKS_KUBECONFIG_SA }}" | base64 --decode > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          echo "✅ kubeconfig restored successfully"
+          kubectl cluster-info
+
+      # ✅ 디버깅용
+      - name: Verify kubectl context
+        run: |
+          kubectl config current-context
+          kubectl get ns
+          kubectl get pods -A || true
+
+      # ✅ 실제 배포 실행
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f deployment.yaml
+          kubectl rollout status deployment/filterfacts-backend -n default || true
