@@ -3,7 +3,7 @@ name: Deploy FilterFacts to Naver Cloud Kubernetes
 on:
   push:
     branches:
-      - deploy  # main 브랜치에 push 될 때 자동 배포
+      - deploy  # deploy 브랜치에 push 될 때 자동 배포
 
 jobs:
   build-and-deploy:
@@ -61,7 +61,6 @@ jobs:
           echo "ncloud_secret_access_key = ${NCP_SECRET_ACCESS_KEY}" >> $HOME/.ncloud/configure
           echo "ncloud_api_url = https://ncloud.apigw.ntruss.com" >> $HOME/.ncloud/configure
           chmod 600 $HOME/.ncloud/configure
-          # ✅ 루트 경로에도 동일한 인증파일 복사
           sudo mkdir -p /root/.ncloud
           sudo cp $HOME/.ncloud/configure /root/.ncloud/configure
           sudo chmod 600 /root/.ncloud/configure
@@ -87,7 +86,16 @@ jobs:
           echo "Listing /usr/local/bin"
           ls -al /usr/local/bin | grep ncp || true
 
-      # 11️⃣ ✅ Kubernetes 배포 실행 (Inline ENV 주입 방식)
+      # 🔍 ✅ 연결 확인 단계 추가 (여기!)
+      - name: Verify Kubernetes Connection
+        run: |
+          echo "🔍 Checking Kubernetes cluster connectivity..."
+          kubectl cluster-info
+          kubectl config current-context
+          kubectl get namespaces
+          echo "✅ Successfully connected to Kubernetes cluster!"
+
+      # 11️⃣ ✅ Kubernetes 배포 실행
       - name: Apply Kubernetes manifests
         run: |
           echo "🔑 Starting deploy with inline credentials..."
