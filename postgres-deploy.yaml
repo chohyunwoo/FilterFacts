@@ -23,7 +23,7 @@ spec:
             - name: POSTGRES_USER
               value: postgres
             - name: POSTGRES_PASSWORD
-              value: 3684
+              value: "3684"
           volumeMounts:           # ✅ 이 부분 추가 (임시 저장소)
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
