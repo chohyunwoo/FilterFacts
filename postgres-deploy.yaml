@@ -24,6 +24,12 @@ spec:
               value: postgres
             - name: POSTGRES_PASSWORD
               value: 3684
+          volumeMounts:           # ✅ 이 부분 추가 (임시 저장소)
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:                   # ✅ 실제 볼륨 정의 (임시)
+        - name: postgres-storage
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
