@@ -18,6 +18,9 @@ spec:
           image: contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
           ports:
             - containerPort: 8080
+          imagePullPolicy: Always
+      imagePullSecrets:          # ✅ 여기가 추가 포인트
+        - name: ncr-secret       # 위에서 만든 secret 이름과 동일해야 함
 ---
 apiVersion: v1
 kind: Service
