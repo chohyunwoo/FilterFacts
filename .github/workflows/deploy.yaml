@@ -86,3 +86,9 @@ jobs:
         run: |
           echo "🚀 Deploying FilterFacts backend to NKS..."
           kubectl apply -f deploy.yaml --validate=false
+
+       # PostgreSQL도 함께 배포
+      - name: Deploy PostgreSQL to NKS
+        run: |
+          echo "🗄️ Deploying PostgreSQL..."
+          kubectl apply -f postgres-deploy.yaml --validate=false
