@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: f-f-backend
-
 spec:
   replicas: 1
   selector:
@@ -19,8 +18,21 @@ spec:
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
-      imagePullSecrets:          # ✅ 여기가 추가 포인트
-        - name: ncr-secret       # 위에서 만든 secret 이름과 동일해야 함
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres-service:5432/FilterFacts"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "3684"
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: "update"
+            - name: SPRING_JPA_SHOW_SQL
+              value: "true"
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
+              value: "true"
+      imagePullSecrets:
+        - name: ncr-secret
 ---
 apiVersion: v1
 kind: Service
