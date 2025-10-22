@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.*;
 import com.example.myapplication.R;
 import com.example.myapplication.network.common.ApiClient;
@@ -23,7 +24,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText emailEditText, codeEditText, userIdEditText, passwordEditText;
     private Button sendCodeButton, resendCodeButton, verifyCodeButton, registerButton;
-    private TextView statusTextView;
+    private TextView statusTextView, codeErrorTextView;
 
     private ApiService apiService;
     private Gson gson;
@@ -38,7 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         bindViews();
 
-        // ✅ ApiClient로 Retrofit 가져오기
+        // ApiClient로 Retrofit 가져오기
         ApiClient apiClient = new ApiClient(getApplicationContext());
         apiService = apiClient.getRetrofit().create(ApiService.class);
 
@@ -55,6 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
         verifyCodeButton = findViewById(R.id.verify_code_button);
         registerButton = findViewById(R.id.register_button);
         statusTextView = findViewById(R.id.status_text_view);
+        codeErrorTextView = findViewById(R.id.code_error_text_view);
 
         registerButton.setEnabled(false); // 인증 전 비활성화
     }
@@ -119,7 +121,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override public void onResponse(Call<ResponseBody> call, Response<ResponseBody> resp) {
                 if (resp.isSuccessful()) {
                     setStatus(resend ? "인증코드가 재전송되었습니다." : "인증코드가 전송되었습니다.");
-                    toast("인증코드 전송");
+                    toast("인증코드가 전송되었습니다.");
                 } else {
                     setStatus("코드 전송 실패 (code=" + resp.code() + ")");
                 }
@@ -139,7 +141,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
         if (code.length() != 6) {
-            setStatus("인증코드는 6자리 숫자입니다.");
+            codeErrorTextView.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -150,12 +152,12 @@ public class RegisterActivity extends AppCompatActivity {
                     emailVerified = true;
                     lastEmail = email;
                     registerButton.setEnabled(true);
-                    setStatus("이메일 인증 완료! 이제 가입할 수 있어요.");
+                    codeErrorTextView.setVisibility(View.GONE);
                     toast("이메일 인증 성공");
                 } else {
                     emailVerified = false;
                     registerButton.setEnabled(false);
-                    setStatus("인증 실패 (code=" + resp.code() + ")");
+                    codeErrorTextView.setVisibility(View.VISIBLE);
                 }
             }
             @Override public void onFailure(Call<ResponseBody> call, Throwable t) {

@@ -68,6 +68,15 @@
             android:minHeight="48dp"
             android:layout_marginBottom="8dp" />
 
+        <TextView
+            android:id="@+id/code_error_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:text="인증코드가 틀렸습니다" />
+
         <Button
             android:id="@+id/verify_code_button"
             android:layout_width="match_parent"
