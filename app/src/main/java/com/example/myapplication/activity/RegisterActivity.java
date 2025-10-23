@@ -1,6 +1,7 @@
 package com.example.myapplication.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,15 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import com.example.myapplication.R;
-import com.example.myapplication.network.common.ApiClient;
-import com.example.myapplication.network.common.ApiService;
-import com.example.myapplication.network.data.request.SendCodeRequest;
-import com.example.myapplication.network.data.request.UserJoinRequest;
-import com.example.myapplication.network.data.request.VerifyCodeRequest;
-import com.google.gson.Gson;
-import okhttp3.ResponseBody;
-import retrofit2.*;
+import com.example.myapplication.viewmodel.RegisterViewModel;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
@@ -26,8 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button sendCodeButton, resendCodeButton, verifyCodeButton, registerButton;
     private TextView statusTextView, codeErrorTextView;
 
-    private ApiService apiService;
-    private Gson gson;
+    private RegisterViewModel vm;
 
     private boolean emailVerified = false;
     private String lastEmail = null;
@@ -40,10 +35,49 @@ public class RegisterActivity extends AppCompatActivity {
         bindViews();
 
         // ApiClient로 Retrofit 가져오기
-        ApiClient apiClient = new ApiClient(getApplicationContext());
-        apiService = apiClient.getRetrofit().create(ApiService.class);
+        vm = new ViewModelProvider(this).get(RegisterViewModel.class);
 
         setupListeners();
+
+        vm.getStatus().observe(this, s -> { if (s != null) setStatus(s); });
+        vm.getEmailVerified().observe(this, ok -> {
+            boolean v = ok != null && ok;
+            emailVerified = v;
+            if (v) {
+                lastEmail = text(emailEditText);
+                registerButton.setEnabled(true);
+                codeErrorTextView.setVisibility(View.GONE);
+                toast("이메일 인증 성공");
+            } else {
+                registerButton.setEnabled(false);
+                codeErrorTextView.setVisibility(View.VISIBLE);
+            }
+        });
+        vm.getRegistered().observe(this, ok -> {
+            if (ok != null && ok) {
+                setStatus("회원가입 성공!");
+                toast("회원가입 성공");
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        vm.getError().observe(this, err -> {
+            if (err != null && !err.isEmpty()) {
+                setStatus(err);
+            }
+        });
+        vm.getLoading().observe(this, loading -> {
+            boolean l = loading != null && loading;
+            emailEditText.setEnabled(!l);
+            codeEditText.setEnabled(!l);
+            userIdEditText.setEnabled(!l);
+            passwordEditText.setEnabled(!l);
+            sendCodeButton.setEnabled(!l);
+            resendCodeButton.setEnabled(!l);
+            verifyCodeButton.setEnabled(!l);
+            registerButton.setEnabled(!l && emailVerified);
+        });
     }
 
     private void bindViews() {
@@ -82,30 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
                 setStatus("비밀번호는 6자 이상이어야 합니다.");
                 return;
             }
-
-            UserJoinRequest body = new UserJoinRequest(userId, password, lastEmail);
-            log("회원가입 요청: " + body);
-
-            apiService.register(body).enqueue(new Callback<Void>() {
-                @Override public void onResponse(Call<Void> call, Response<Void> resp) {
-                    if (resp.isSuccessful()) {
-                        setStatus("회원가입 성공!");
-                        toast("회원가입 성공");
-
-                        // 로그인 화면으로 이동
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else if (resp.code() == 409) {
-                        setStatus("이미 존재하는 아이디입니다.");
-                    } else {
-                        setStatus("회원가입 실패 (code=" + resp.code() + ")");
-                    }
-                }
-                @Override public void onFailure(Call<Void> call, Throwable t) {
-                    setStatus("서버와 통신할 수 없습니다: " + t.getMessage());
-                }
-            });
+            vm.register(userId, password, lastEmail);
         });
     }
 
@@ -115,21 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
             setStatus("이메일을 입력해주세요.");
             return;
         }
-
-        SendCodeRequest body = new SendCodeRequest(email, "signup");
-        apiService.sendCode(body).enqueue(new Callback<ResponseBody>() {
-            @Override public void onResponse(Call<ResponseBody> call, Response<ResponseBody> resp) {
-                if (resp.isSuccessful()) {
-                    setStatus(resend ? "인증코드가 재전송되었습니다." : "인증코드가 전송되었습니다.");
-                    toast("인증코드가 전송되었습니다.");
-                } else {
-                    setStatus("코드 전송 실패 (code=" + resp.code() + ")");
-                }
-            }
-            @Override public void onFailure(Call<ResponseBody> call, Throwable t) {
-                setStatus("네트워크 오류: sendCode " + t.getMessage());
-            }
-        });
+        vm.sendCode(email, resend);
     }
 
     private void verifyCode() {
@@ -144,26 +141,7 @@ public class RegisterActivity extends AppCompatActivity {
             codeErrorTextView.setVisibility(View.VISIBLE);
             return;
         }
-
-        VerifyCodeRequest body = new VerifyCodeRequest(email, "signup", code);
-        apiService.verifyCode(body).enqueue(new Callback<ResponseBody>() {
-            @Override public void onResponse(Call<ResponseBody> call, Response<ResponseBody> resp) {
-                if (resp.isSuccessful()) {
-                    emailVerified = true;
-                    lastEmail = email;
-                    registerButton.setEnabled(true);
-                    codeErrorTextView.setVisibility(View.GONE);
-                    toast("이메일 인증 성공");
-                } else {
-                    emailVerified = false;
-                    registerButton.setEnabled(false);
-                    codeErrorTextView.setVisibility(View.VISIBLE);
-                }
-            }
-            @Override public void onFailure(Call<ResponseBody> call, Throwable t) {
-                setStatus("네트워크 오류: " + t.getMessage());
-            }
-        });
+        vm.verifyCode(email, code);
     }
 
     private String text(EditText et) { return et.getText().toString().trim(); }

@@ -6,25 +6,23 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.myapplication.common.ChatItem;
 import com.example.myapplication.R;
 
 import java.util.List;
 
-public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MessageAdapter extends ListAdapter<ChatItem, RecyclerView.ViewHolder> {
     private static final int TYPE_USER = 1;
     private static final int TYPE_AI = 2;
 
-    private final List<ChatItem> items;
-
-    public MessageAdapter(List<ChatItem> items) {
-        this.items = items;
-    }
+    public MessageAdapter() { super(DIFF); }
 
     @Override public int getItemViewType(int position) {
-        return items.get(position).isUser ? TYPE_USER : TYPE_AI;
+        ChatItem item = getItem(position);
+        return item != null && item.isUser ? TYPE_USER : TYPE_AI;
     }
 
     @NonNull @Override
@@ -36,18 +34,25 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         TextView tv = holder.itemView.findViewById(R.id.tvMsg);
-        tv.setText(items.get(position).text);
+        ChatItem item = getItem(position);
+        tv.setText(item == null ? "" : item.text);
     }
 
-    @Override public int getItemCount() { return items.size(); }
+    private static final DiffUtil.ItemCallback<ChatItem> DIFF = new DiffUtil.ItemCallback<ChatItem>() {
+        @Override public boolean areItemsTheSame(@NonNull ChatItem oldItem, @NonNull ChatItem newItem) {
+            return oldItem == newItem;
+        }
+        @Override public boolean areContentsTheSame(@NonNull ChatItem oldItem, @NonNull ChatItem newItem) {
+            return oldItem.isUser == newItem.isUser &&
+                   ((oldItem.text == null && newItem.text == null) || (oldItem.text != null && oldItem.text.contentEquals(newItem.text)));
+        }
+    };
 
     public void add(ChatItem item) {
-        items.add(item);
-        notifyItemInserted(items.size() - 1);
+        submitList(getCurrentList());
     }
 
     public void clear() {
-        items.clear();
-        notifyDataSetChanged();
+        submitList(null);
     }
 }
