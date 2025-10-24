@@ -36,9 +36,9 @@ spec:
               value: "true"
 
             # ✅ Redis 설정 (새로 추가된 부분)
-            - name: SPRING_DATA_REDIS_HOST
+            - name: REDIS_HOST
               value: "redis-service"
-            - name: SPRING_DATA_REDIS_PORT
+            - name: REDIS_PORT
               value: "6379"
       imagePullSecrets:
         - name: ncr-secret
