@@ -16,8 +16,19 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
+
+    signingConfigs {
+        release {
+            storeFile file("C:\\Users\\user\\.android\\my-app.jks") // 실제 경로로 수정
+    storePassword "12qwaszx!"
+    keyAlias "mykey"
+    keyPassword "12qwaszx!"
+}
+
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
