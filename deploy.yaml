@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: f-f-backend
-          image: hf9fzsj9.kr.private-ncr.ntruss.com/filterfacts-backend:latest
+          image: hf9fzsj9.kr.private-ncr.ntruss.com/filterfacts-backend
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
