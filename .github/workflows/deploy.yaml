@@ -27,25 +27,22 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test
 
-       # 4️⃣ Docker 이미지 빌드 및 푸시
+      # 4️⃣ Docker 이미지 빌드 및 푸시 (자동 버전 태그)
       - name: Build and Push Docker image
         run: |
-          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
-          
-          echo "🔑 Logging in to Naver Cloud Registry..."
+          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend
+          TAG=$(date +'%Y%m%d-%H%M%S')
+          echo "🚀 Building image with tag: $TAG"
+
           echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
             -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
             --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
 
-          echo "🚀 Building Docker image (forcing new JAR)..."
-          docker build --no-cache \
-            --build-arg CACHEBUST=$(date +%s) \
-            -t $IMAGE .
+          docker build -t $IMAGE:$TAG -t $IMAGE:latest .
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
 
-          echo "📦 Pushing image to Naver Cloud Registry..."
-          docker push $IMAGE
-
-      # 5️⃣ 최신 IAM Authenticator 설치 (v1.1.1)
+      # 5️⃣ IAM Authenticator 설치
       - name: Install Naver Cloud IAM Authenticator
         run: |
           ARCH=$(uname -m)
@@ -58,14 +55,13 @@ jobs:
             exit 1
           fi
 
-          echo "📦 Downloading NCP IAM Authenticator (v1.1.1)..."
+          echo "📦 Downloading NCP IAM Authenticator..."
           curl -fL -o ncp-iam-authenticator ${FILE_URL}
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
-          echo "✅ Installed version:"
           ncp-iam-authenticator version
 
-      # 6️⃣ Naver Cloud configure 복원 (AccessKey + SecretKey)
+      # 6️⃣ Naver Cloud 설정 복원
       - name: Restore Naver Cloud config
         run: |
           mkdir -p $HOME/.ncloud
@@ -82,29 +78,30 @@ jobs:
           echo "✅ kubeconfig restored successfully"
           kubectl config get-contexts
 
-      # 8️⃣ IAM Authenticator 토큰 확인
+      # 8️⃣ 토큰 테스트
       - name: Verify IAM Authenticator
         run: |
-          echo "🔑 Verifying IAM Authenticator..."
-          ncp-iam-authenticator token --clusterUuid 8ecb23d9-10ef-4041-80ed-6f65f2e0f0c3 --region KR || echo "⚠️ Token test failed, check AccessKey configuration."
+          ncp-iam-authenticator token --clusterUuid 8ecb23d9-10ef-4041-80ed-6f65f2e0f0c3 --region KR || echo "⚠️ Token test failed."
 
-      # 9️⃣ PostgreSQL 먼저 배포
+      # 9️⃣ PostgreSQL 배포
       - name: 🗄️ Deploy PostgreSQL to NKS
         run: |
-          echo "🗄️ Deploying PostgreSQL..."
           kubectl apply -f postgres-deploy.yaml --validate=false
 
       # 🔟 Redis 배포
       - name: 🚀 Deploy Redis to NKS
         run: |
-          echo "🚀 Deploying Redis..."
           kubectl apply -f redis-deploy.yaml --validate=false
 
-      # 11️⃣ Backend(Spring Boot) 배포 (마지막)
+      # 11️⃣ Backend 배포 (자동 최신 태그 적용)
       - name: ☕ Deploy FilterFacts Backend to NKS
         run: |
-          echo "☕ Deploying FilterFacts Backend..."
-          kubectl apply -f deploy.yaml --validate=false
+          echo "☕ Deploying backend with latest tag..."
+          TAG=$(date +'%Y%m%d-%H%M%S')
+          kubectl set image deployment/f-f-backend \
+            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:$TAG \
+            --record
+          kubectl rollout status deployment/f-f-backend
 
       # 12️⃣ 배포 확인
       - name: ✅ Verify Deployment Status
