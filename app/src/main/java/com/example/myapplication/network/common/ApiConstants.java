@@ -1,7 +1,9 @@
 package com.example.myapplication.network.common;
 
 public class ApiConstants {
-    public static final String BASE_URL = "http://34.64.152.129:8080/"; // 끝에 / 유지!
+    public static final String BASE_URL = "http://34.64.152.129:8080/";
+//    public static final String BASE_URL = "http://default-backend-service-e92d5-111766164-4549ba871264.kr.lb.naverncp.com/";
+//    public static final String BASE_URL = "http://default-backend-service-e92d5-111766164-4549ba871264.kr.lb.naverncp.com:8080/";
 
     // Auth
     public static final String AUTH_BASE = BASE_URL + "api/auth";

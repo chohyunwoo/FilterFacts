@@ -7,25 +7,20 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.myapplication.common.ConversationItem;
 
-import java.util.List;
-
-// 제목만 보이는 아주 단순한 어댑터
-public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.Holder> {
+public class ConversationAdapter extends ListAdapter<ConversationItem, ConversationAdapter.Holder> {
 
     public interface OnItemClick {
         void onClick(ConversationItem item);
     }
 
-    private final List<ConversationItem> data;
     private final OnItemClick onItemClick;
 
-    public ConversationAdapter(List<ConversationItem> data, OnItemClick onItemClick) {
-        this.data = data;
-        this.onItemClick = onItemClick;
-    }
+    public ConversationAdapter(OnItemClick onItemClick) { super(DIFF); this.onItemClick = onItemClick; }
 
     @NonNull
     @Override
@@ -37,16 +32,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull Holder h, int position) {
-        ConversationItem item = data.get(position);
+        ConversationItem item = getItem(position);
         h.title.setText(item.getTitle());
         h.itemView.setOnClickListener(v -> {
             if (onItemClick != null) onItemClick.onClick(item);
         });
-    }
-
-    @Override
-    public int getItemCount() {
-        return data.size();
     }
 
     static class Holder extends RecyclerView.ViewHolder {
@@ -56,4 +46,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             title = itemView.findViewById(android.R.id.text1);
         }
     }
+
+    private static final DiffUtil.ItemCallback<ConversationItem> DIFF = new DiffUtil.ItemCallback<ConversationItem>() {
+        @Override public boolean areItemsTheSame(@NonNull ConversationItem o, @NonNull ConversationItem n) { return o.getId() == n.getId(); }
+        @Override public boolean areContentsTheSame(@NonNull ConversationItem o, @NonNull ConversationItem n) { return o.getTitle().equals(n.getTitle()); }
+    };
 }
