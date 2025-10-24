@@ -27,14 +27,22 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      # 4️⃣ Docker 이미지 빌드 및 푸시
+       # 4️⃣ Docker 이미지 빌드 및 푸시
       - name: Build and Push Docker image
         run: |
           IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
+          
+          echo "🔑 Logging in to Naver Cloud Registry..."
           echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
             -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
             --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
-          docker build -t $IMAGE .
+
+          echo "🚀 Building Docker image (forcing new JAR)..."
+          docker build --no-cache \
+            --build-arg CACHEBUST=$(date +%s) \
+            -t $IMAGE .
+
+          echo "📦 Pushing image to Naver Cloud Registry..."
           docker push $IMAGE
 
       # 5️⃣ 최신 IAM Authenticator 설치 (v1.1.1)
