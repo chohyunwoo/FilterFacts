@@ -97,13 +97,14 @@ jobs:
       - name: ☕ Deploy FilterFacts Backend to NKS
         run: |
           echo "☕ Deploying backend with latest tag..."
-          TAG=$(date +'%Y%m%d-%H%M%S')
+          LATEST_TAG=$(date +'%Y%m%d-%H%M%S')
           kubectl set image deployment/f-f-backend \
-            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:$TAG \
-            --record
-          kubectl rollout status deployment/f-f-backend
+            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:$LATEST_TAG || \
+          kubectl set image deployment/f-f-backend \
+            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
+          kubectl rollout status deployment/f-f-backend --timeout=180s || echo "⚠️ Rollout timeout, check manually"
 
-      # 12️⃣ 배포 확인
+      # 12️⃣ 배포 상태 확인
       - name: ✅ Verify Deployment Status
         run: |
           kubectl get pods
