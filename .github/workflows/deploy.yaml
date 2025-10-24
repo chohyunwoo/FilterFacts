@@ -92,3 +92,9 @@ jobs:
         run: |
           echo "🗄️ Deploying PostgreSQL..."
           kubectl apply -f postgres-deploy.yaml --validate=false
+
+      # 9️⃣ Redis 배포  ← ✅ 새로 추가된 부분
+      - name: 🚀 Deploy Redis
+        run: |
+          echo "🚀 Deploying Redis..."
+          kubectl apply -f redis-deploy.yaml --validate=false
