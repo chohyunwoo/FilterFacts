@@ -30,8 +30,6 @@ spec:
             # ✅ JPA 설정
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
-            - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
-              value: "true"
 
             # ✅ Redis 설정 (새로 추가된 부분)
             - name: REDIS_HOST
