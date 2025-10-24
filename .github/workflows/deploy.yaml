@@ -27,11 +27,13 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      # 4️⃣ Docker 이미지 빌드 및 푸시 (자동 버전 태그)
+      # 4️⃣ Docker 이미지 빌드 및 푸시 (일관된 TAG 사용)
       - name: Build and Push Docker image
+        id: build
         run: |
           IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend
           TAG=$(date +'%Y%m%d-%H%M%S')
+          echo "TAG=$TAG" >> $GITHUB_ENV
           echo "🚀 Building image with tag: $TAG"
 
           echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
@@ -93,15 +95,13 @@ jobs:
         run: |
           kubectl apply -f redis-deploy.yaml --validate=false
 
-      # 11️⃣ Backend 배포 (자동 최신 태그 적용)
+      # 11️⃣ Backend(Spring Boot) 배포 (빌드된 TAG 자동 반영)
       - name: ☕ Deploy FilterFacts Backend to NKS
         run: |
-          echo "☕ Deploying backend with latest tag..."
-          LATEST_TAG=$(date +'%Y%m%d-%H%M%S')
+          echo "☕ Deploying backend with tag: $TAG"
           kubectl set image deployment/f-f-backend \
-            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:$LATEST_TAG || \
-          kubectl set image deployment/f-f-backend \
-            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:latest
+            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:$TAG \
+            --record
           kubectl rollout status deployment/f-f-backend --timeout=180s || echo "⚠️ Rollout timeout, check manually"
 
       # 12️⃣ 배포 상태 확인
