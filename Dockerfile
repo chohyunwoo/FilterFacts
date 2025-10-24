@@ -1,4 +1,5 @@
 # ------------------------------
+ARG CACHEBUST=1
 # 1️⃣ Base Image
 # ------------------------------
 FROM openjdk:21-jdk-slim AS builder
