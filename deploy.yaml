@@ -30,8 +30,6 @@ spec:
             # ✅ JPA 설정
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
-            - name: SPRING_JPA_SHOW_SQL
-              value: "true"
             - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
               value: "true"
 
