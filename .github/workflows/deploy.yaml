@@ -64,7 +64,6 @@ jobs:
           echo "${{ secrets.NCP_CONFIG }}" | base64 --decode > $HOME/.ncloud/configure
           chmod 600 $HOME/.ncloud/configure
           echo "✅ ~/.ncloud/configure restored successfully!"
-          cat $HOME/.ncloud/configure
 
       # 7️⃣ kubeconfig 복원
       - name: Restore kubeconfig
@@ -81,20 +80,26 @@ jobs:
           echo "🔑 Verifying IAM Authenticator..."
           ncp-iam-authenticator token --clusterUuid 8ecb23d9-10ef-4041-80ed-6f65f2e0f0c3 --region KR || echo "⚠️ Token test failed, check AccessKey configuration."
 
-      # 9️⃣ NKS로 배포
-      - name: Deploy to Naver Cloud Kubernetes
-        run: |
-          echo "🚀 Deploying FilterFacts backend to NKS..."
-          kubectl apply -f deploy.yaml --validate=false
-
-       # PostgreSQL도 함께 배포
-      - name: Deploy PostgreSQL to NKS
+      # 9️⃣ PostgreSQL 먼저 배포
+      - name: 🗄️ Deploy PostgreSQL to NKS
         run: |
           echo "🗄️ Deploying PostgreSQL..."
           kubectl apply -f postgres-deploy.yaml --validate=false
 
-      # 9️⃣ Redis 배포  ← ✅ 새로 추가된 부분
-      - name: 🚀 Deploy Redis
+      # 🔟 Redis 배포
+      - name: 🚀 Deploy Redis to NKS
         run: |
           echo "🚀 Deploying Redis..."
           kubectl apply -f redis-deploy.yaml --validate=false
+
+      # 11️⃣ Backend(Spring Boot) 배포 (마지막)
+      - name: ☕ Deploy FilterFacts Backend to NKS
+        run: |
+          echo "☕ Deploying FilterFacts Backend..."
+          kubectl apply -f deploy.yaml --validate=false
+
+      # 12️⃣ 배포 확인
+      - name: ✅ Verify Deployment Status
+        run: |
+          kubectl get pods
+          kubectl get svc
