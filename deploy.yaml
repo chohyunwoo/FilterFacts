@@ -19,18 +19,27 @@ spec:
             - containerPort: 8080
           imagePullPolicy: Always
           env:
+            # ✅ PostgreSQL 설정
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:postgresql://postgres-service:5432/FilterFacts"
             - name: SPRING_DATASOURCE_USERNAME
               value: "postgres"
             - name: SPRING_DATASOURCE_PASSWORD
               value: "3684"
+
+            # ✅ JPA 설정
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
             - name: SPRING_JPA_SHOW_SQL
               value: "true"
             - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
               value: "true"
+
+            # ✅ Redis 설정 (새로 추가된 부분)
+            - name: SPRING_DATA_REDIS_HOST
+              value: "redis-service"
+            - name: SPRING_DATA_REDIS_PORT
+              value: "6379"
       imagePullSecrets:
         - name: ncr-secret
 ---
