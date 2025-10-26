@@ -84,17 +84,7 @@ jobs:
       - name: Verify IAM Authenticator
         run: |
           ncp-iam-authenticator token --clusterUuid 8ecb23d9-10ef-4041-80ed-6f65f2e0f0c3 --region KR || echo "⚠️ Token test failed."
-
-      # 9️⃣ PostgreSQL 배포
-      - name: 🗄️ Deploy PostgreSQL to NKS
-        run: |
-          kubectl apply -f postgres-deploy.yaml --validate=false
-
-      # 🔟 Redis 배포
-      - name: 🚀 Deploy Redis to NKS
-        run: |
-          kubectl apply -f redis-deploy.yaml --validate=false
-
+          
       # 11️⃣ Backend(Spring Boot) 배포 (빌드된 TAG 자동 반영)
       - name: ☕ Deploy FilterFacts Backend to NKS
         run: |
