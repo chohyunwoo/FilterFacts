@@ -10,28 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ 코드 체크아웃
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      # 2️⃣ JDK 21 설치
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      # 3️⃣ Gradle 빌드
       - name: Build with Gradle
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      # ✅ 4️⃣ Backend Docker 이미지 빌드 & Push
-      - name: Build and Push Backend Docker image
+      - name: Build and Push Docker image
         id: build
         run: |
           IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend
           TAG=$(date +'%Y%m%d-%H%M%S')
           echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "🚀 Building image with tag: $TAG"
 
           echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
             -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
@@ -40,17 +39,8 @@ jobs:
           docker build -t $IMAGE:$TAG -t $IMAGE:latest .
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
-          echo "✅ Backend push complete: $IMAGE:$TAG"
 
-      # ✅ 5️⃣ pgvector PostgreSQL 이미지 Push (수동 1회용)
-      - name: Push PostgreSQL + pgvector image
-        run: |
-         IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres-pgvector
-         docker build -t $IMAGE:latest -f Dockerfile.pgvector .
-         docker push $IMAGE:latest
-
-      # ✅ 6️⃣ NKS 인증 설정
-      - name: Install IAM Authenticator
+      - name: Install Naver Cloud IAM Authenticator
         run: |
           ARCH=$(uname -m)
           if [ "$ARCH" = "x86_64" ]; then
@@ -58,6 +48,7 @@ jobs:
           else
             FILE_URL="https://github.com/NaverCloudPlatform/ncp-iam-authenticator/releases/download/v1.1.1/ncp-iam-authenticator_linux_arm64"
           fi
+
           curl -fL -o ncp-iam-authenticator ${FILE_URL}
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
@@ -74,22 +65,20 @@ jobs:
           echo "${{ secrets.NKS_KUBECONFIG1 }}" | base64 --decode > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      # ✅ 7️⃣ deploy.yaml 변경 자동 반영 (replica, ENV, 설정 변경 반영)
-      - name: Apply Deployment YAML (Update settings)
+      - name: Apply Deployment YAML (update replicas)
         run: |
+          echo "📌 Applying updated deploy.yaml..."
           kubectl apply -f deploy.yaml
 
-      # ✅ 8️⃣ 새 TAG 적용하여 롤링 업데이트
-      - name: Deploy Backend with New Docker Image
+      - name: Deploy Backend with Updated Image Tag
         run: |
-          echo "☕ Deploying backend with image tag: ${{ env.TAG }}"
+          echo "☕ Deploying backend with tag: $TAG"
           kubectl set image deployment/f-f-backend \
-            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:${{ env.TAG }} \
+            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:$TAG \
             --record
           kubectl rollout status deployment/f-f-backend --timeout=200s
 
-      # ✅ 9️⃣ 배포 상태 검증
-      - name: ✅ Verify Deployment
+      - name: ✅ Verify Deployment Status
         run: |
           kubectl get pods -o wide
           kubectl get svc
