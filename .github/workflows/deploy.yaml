@@ -45,10 +45,9 @@ jobs:
       # ✅ 5️⃣ pgvector PostgreSQL 이미지 Push (수동 1회용)
       - name: Push PostgreSQL + pgvector image
         run: |
-          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres-pgvector
-          docker tag filterfacts-postgres-pgvector:latest $IMAGE:latest
-          docker push $IMAGE:latest
-          echo "✅ PostgreSQL pgvector push complete!"
+         IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres-pgvector
+         docker build -t $IMAGE:latest -f Dockerfile.pgvector .
+         docker push $IMAGE:latest
 
       # ✅ 6️⃣ NKS 인증 설정
       - name: Install IAM Authenticator
