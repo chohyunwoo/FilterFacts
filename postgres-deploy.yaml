@@ -15,7 +15,7 @@ spec:
       containers:
         - name: postgres
           # ✅ pgvector 포함된 이미지로 변경
-          image: ankane/pgvector:pg17
+          image: pgvector/pgvector:pg17
           ports:
             - containerPort: 5432
           env:
@@ -43,7 +43,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: nks-default-storage-class
+  storageClassName: nks-block-storage
 ---
 apiVersion: v1
 kind: Service
