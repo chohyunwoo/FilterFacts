@@ -94,6 +94,13 @@ jobs:
             --record
           kubectl rollout status deployment/f-f-backend --timeout=180s || echo "⚠️ Rollout timeout, check manually"
 
+           # 📌 11-2️⃣ Deployment YAML 적용 (replicas 변경 반영)
+      - name: 📌 Apply Deployment YAML
+        run: |
+          echo "📌 Applying deploy.yaml changes..."
+          kubectl apply -f deploy.yaml
+          kubectl rollout status deployment/f-f-backend --timeout=180s || echo "⚠️ Rollout timeout, check manually"
+
       # 12️⃣ 배포 상태 확인
       - name: ✅ Verify Deployment Status
         run: |
