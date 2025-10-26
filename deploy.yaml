@@ -1,3 +1,4 @@
+# nonk8s
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
         - name: f-f-backend
-          image: hf9fzsj9.kr.private-ncr.ntruss.com/filterfacts-backend
+          image: hf9fzsj9.kr.private-ncr.ntruss.com/filterfacts-backend:__TAG__
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
