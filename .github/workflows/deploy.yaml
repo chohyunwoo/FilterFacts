@@ -27,26 +27,6 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      # ✅ 4. PostgreSQL + pgvector 이미지 빌드 & Push (DB 먼저)
-      - name: Build and Push PostgreSQL pgvector image
-        run: |
-          PG_IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres
-          PG_TAG=$(date +'%Y%m%d-%H%M%S')
-          echo "PG_TAG=$PG_TAG" >> $GITHUB_ENV
-          echo "🐘 Building and pushing PostgreSQL pgvector image: $PG_TAG"
-
-          echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
-            -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
-            --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
-
-          docker build -t $PG_IMAGE:$PG_TAG -t $PG_IMAGE:latest \
-            -f ./Dockerfile.pgvector .
-
-          docker push $PG_IMAGE:$PG_TAG
-          docker push $PG_IMAGE:latest
-
-          echo "✅ PostgreSQL pgvector push complete!"
-
       # ✅ 5. Backend Docker 이미지 빌드 & Push
       - name: Build and Push Backend Docker image
         id: build
