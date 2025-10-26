@@ -10,37 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ 1. 코드 체크아웃
       - name: Checkout source
         uses: actions/checkout@v4
 
+      # ✅ 2. JDK 설정
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
+      # ✅ 3. Gradle 빌드
       - name: Build with Gradle
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      - name: Build and Push Docker image
-        id: build
-        run: |
-          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend
-          TAG=$(date +'%Y%m%d-%H%M%S')
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "🚀 Building image with tag: $TAG"
-
-          echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
-            -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
-            --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
-
-          docker build -t $IMAGE:$TAG -t $IMAGE:latest .
-          docker push $IMAGE:$TAG
-          docker push $IMAGE:latest
-
-             # ✅ PostgreSQL + pgvector 이미지 빌드 & Push
+      # ✅ 4. PostgreSQL + pgvector 이미지 빌드 & Push (DB 먼저)
       - name: Build and Push PostgreSQL pgvector image
         run: |
           PG_IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres
@@ -58,10 +45,28 @@ jobs:
           docker push $PG_IMAGE:$PG_TAG
           docker push $PG_IMAGE:latest
 
-          echo "✅ PostgreSQL pgvector image push complete!"
+          echo "✅ PostgreSQL pgvector push complete!"
 
+      # ✅ 5. Backend Docker 이미지 빌드 & Push
+      - name: Build and Push Backend Docker image
+        id: build
+        run: |
+          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend
+          TAG=$(date +'%Y%m%d-%H%M%S')
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "🚀 Building Backend image with tag: $TAG"
 
+          echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
+            -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
+            --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
 
+          docker build -t $IMAGE:$TAG -t $IMAGE:latest .
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
+
+          echo "✅ Backend push complete!"
+
+      # ✅ 6. IAM Authenticator 설치
       - name: Install Naver Cloud IAM Authenticator
         run: |
           ARCH=$(uname -m)
@@ -75,6 +80,7 @@ jobs:
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
 
+      # ✅ 7. 설정 가져오기
       - name: Restore Naver Cloud config
         run: |
           mkdir -p $HOME/.ncloud
@@ -87,11 +93,12 @@ jobs:
           echo "${{ secrets.NKS_KUBECONFIG1 }}" | base64 --decode > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      - name: Apply Deployment YAML (update replicas)
+      # ✅ 8. 배포 파일 반영 (Pod replica, ENV 변경 적용)
+      - name: Apply Deployment YAML
         run: |
-          echo "📌 Applying updated deploy.yaml..."
           kubectl apply -f deploy.yaml
 
+      # ✅ 9. Backend 새로운 TAG 적용 (롤링 업데이트)
       - name: Deploy Backend with Updated Image Tag
         run: |
           echo "☕ Deploying backend with tag: $TAG"
@@ -100,6 +107,7 @@ jobs:
             --record
           kubectl rollout status deployment/f-f-backend --timeout=200s
 
+      # ✅ 10. 배포 상태 확인
       - name: ✅ Verify Deployment Status
         run: |
           kubectl get pods -o wide
