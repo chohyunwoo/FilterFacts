@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres-pgvector:latest
+          image: contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres:latest
           ports:
             - containerPort: 5432
           env:
