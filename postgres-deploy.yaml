@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          # ✅ pgvector 포함된 이미지로 변경
-          image: pgvector/pgvector:pg17
+          image: contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres-pgvector:latest
           ports:
             - containerPort: 5432
           env:
@@ -25,25 +24,15 @@ spec:
               value: postgres
             - name: POSTGRES_PASSWORD
               value: "3684"
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata   # ✅ 핵심 추가
           volumeMounts:
             - name: postgres-volume
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql/data/pgdata   # ✅ 수정된 mountPath
       volumes:
         - name: postgres-volume
           persistentVolumeClaim:
             claimName: postgres-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: nks-block-storage
 ---
 apiVersion: v1
 kind: Service
