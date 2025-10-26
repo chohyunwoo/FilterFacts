@@ -40,13 +40,26 @@ jobs:
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
 
-          - name: Push PostgreSQL + pgvector image
-          run: |
-          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres-pgvector
-          echo "🐘 Building and pushing PostgreSQL pgvector image..."
-          docker build -t $IMAGE:latest -f ./Dockerfile.pgvector .
-          docker push $IMAGE:latest
-          echo "✅ PostgreSQL pgvector push complete!"
+             # ✅ PostgreSQL + pgvector 이미지 빌드 & Push
+      - name: Build and Push PostgreSQL pgvector image
+        run: |
+          PG_IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres
+          PG_TAG=$(date +'%Y%m%d-%H%M%S')
+          echo "PG_TAG=$PG_TAG" >> $GITHUB_ENV
+          echo "🐘 Building and pushing PostgreSQL pgvector image: $PG_TAG"
+
+          echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
+            -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
+            --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
+
+          docker build -t $PG_IMAGE:$PG_TAG -t $PG_IMAGE:latest \
+            -f ./Dockerfile.pgvector .
+
+          docker push $PG_IMAGE:$PG_TAG
+          docker push $PG_IMAGE:latest
+
+          echo "✅ PostgreSQL pgvector image push complete!"
+
 
 
       - name: Install Naver Cloud IAM Authenticator
