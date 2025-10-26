@@ -24,11 +24,11 @@ spec:
               value: postgres
             - name: POSTGRES_PASSWORD
               value: "3684"
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata   # ✅ 핵심 추가
           volumeMounts:
             - name: postgres-volume
-              mountPath: /var/lib/postgresql/data/pgdata   # ✅ 수정된 mountPath
+              mountPath: /var/lib/postgresql/data
+      imagePullSecrets:
+        - name: ncr-secret
       volumes:
         - name: postgres-volume
           persistentVolumeClaim:
