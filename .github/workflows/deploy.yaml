@@ -39,6 +39,12 @@ jobs:
           docker build -t $IMAGE:$TAG -t $IMAGE:latest .
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
+     # ✅ PostgreSQL + pgvector 이미지 푸시 (수동 1회용)
+      - name: Push PostgreSQL + pgvector image
+        run: |
+          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres-pgvector
+          docker build -t $IMAGE:latest -f Dockerfile.pgvector .
+          docker push $IMAGE:latest
 
       - name: Install Naver Cloud IAM Authenticator
         run: |
