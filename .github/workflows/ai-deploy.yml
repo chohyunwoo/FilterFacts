@@ -21,7 +21,7 @@ jobs:
             -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
             --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
 
-          docker build -t $IMAGE:$TAG -t $IMAGE:latest -f ./ai-server/Dockerfile .
+          docker build -t $IMAGE:$TAG -t $IMAGE:latest -f ./Dockerfile .
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
 
