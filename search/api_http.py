@@ -40,5 +40,11 @@ def ask(req: AskReq):
         raise HTTPException(status_code=500, detail="LLM internal error")
 
     # ====== 그 외 예기치 못한 오류 → 500 ======
-    except Exception:
+#     except Exception:
+#         raise HTTPException(status_code=500, detail="Internal server error")
+    # ✅ 예외 원인 출력 추가
+    except Exception as e:
+        import traceback
+        print("🔥 [ERROR] Exception in /ask:", e)
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail="Internal server error")
