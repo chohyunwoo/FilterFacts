@@ -1,25 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ollama-server
+  name: ollama
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: ollama-server
+      app: ollama
   template:
     metadata:
       labels:
-        app: ollama-server
+        app: ollama
     spec:
       containers:
-        - name: ollama-server
-          image: contest-cluster54-registry.kr.ncr.ntruss.com/ollama-server:latest
+        - name: ollama
+          image: ollama/ollama:latest
           ports:
             - containerPort: 11434
-          env:
-            - name: PYTHONUNBUFFERED
-              value: "1"
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+      volumes:
+        - name: ollama-data
+          emptyDir: {}  # 임시 저장소, PVC 불필요
 ---
 apiVersion: v1
 kind: Service
@@ -27,7 +37,7 @@ metadata:
   name: ollama-service
 spec:
   selector:
-    app: ollama-server
+    app: ollama
   ports:
     - protocol: TCP
       port: 11434
