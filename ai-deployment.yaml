@@ -36,7 +36,7 @@ spec:
             - name: PG_PORT
               value: "5432"
             - name: PG_DATABASE
-              value: "TestDb"
+              value: "FilterFacts"
             - name: PG_USER
               value: "postgres"
             - name: PG_PASSWORD
