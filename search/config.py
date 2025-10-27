@@ -71,7 +71,7 @@ CITATION_STYLE     = _envf("CITATION_STYLE", "[{n}]")
 MAX_PROMPT_CHARS = _enfi("MAX_PROMPT_CHARS", 12000)
 
 # --- LLM ---
-LLM_MODEL       = _envf("LLM_MODEL", "qwen2.5:0.5b-instruct")
+LLM_MODEL       = _envf("LLM_MODEL", "qwen2.5:1.5b-instruct")
 LLM_BASE_URL    = _envf("LLM_BASE_URL", "http://127.0.0.1:11434")
 LLM_TEMPERATURE = _envf_float("LLM_TEMPERATURE", 0.2)
 LLM_TOP_P       = _envf_float("LLM_TOP_P", 0.9)

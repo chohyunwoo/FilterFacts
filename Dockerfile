@@ -9,4 +9,4 @@ COPY . .
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["uvicorn", "search.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "search.api_http:app", "--host", "0.0.0.0", "--port", "8000"]
