@@ -1,0 +1,68 @@
+name: Deploy AI & Ollama Servers to NKS
+
+on:
+  push:
+    branches:
+      - ai
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Naver Container Registry (NCR)
+        run: |
+          echo "${{ secrets.NCP_SECRET_ACCESS_KEY }}" | docker login \
+            -u "${{ secrets.NCP_ACCESS_KEY_ID }}" \
+            --password-stdin ${{ secrets.NCP_CONTAINER_REGISTRY }}
+
+      # ✅ 1. Build & Push AI server image
+      - name: Build and Push AI Server Image
+        run: |
+          AI_IMAGE="${{ secrets.NCP_CONTAINER_REGISTRY }}/ai-server:latest"
+          docker build -t $AI_IMAGE -f Dockerfile .
+          docker push $AI_IMAGE
+
+      # ✅ 2. Build & Push Ollama server image
+      - name: Build and Push Ollama Server Image
+        run: |
+          OLLAMA_IMAGE="${{ secrets.NCP_CONTAINER_REGISTRY }}/ollama-server:latest"
+          docker build -t $OLLAMA_IMAGE -f ollama/Dockerfile ./ollama
+          docker push $OLLAMA_IMAGE
+
+      - name: Set up kubectl
+        run: |
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+
+      - name: Configure NKS access
+        run: |
+          curl -LO https://raw.githubusercontent.com/NaverCloudPlatform/nks-cli/main/install.sh
+          bash install.sh
+          ncp-iam-authenticator token \
+            --access-key ${{ secrets.NCP_ACCESS_KEY_ID }} \
+            --secret-key ${{ secrets.NCP_SECRET_ACCESS_KEY }} \
+            --cluster-uuid ${{ secrets.NCP_CLUSTER_UUID }} > token.json
+
+      # ✅ 3. Deploy both servers to NKS
+      - name: Deploy to NKS
+        run: |
+          kubectl config set-cluster nks --server=https://${{ secrets.NCP_CLUSTER_UUID }}.${{ secrets.NCP_REGION }}.nks.ntruss.com
+          kubectl config set-credentials ncp-user --token=$(cat token.json | jq -r '.status.token')
+          kubectl config set-context nks-context --cluster=nks --user=ncp-user --namespace=${{ secrets.NCP_NAMESPACE }}
+          kubectl config use-context nks-context
+
+          # 🚀 apply both deployments
+          kubectl apply -f ai-deployment.yaml
+          kubectl apply -f ollama-deployment.yaml
+
+          # Optional: rollout status 확인 (배포 완료까지 대기)
+          kubectl rollout status deployment/ai-server --timeout=180s || true
+          kubectl rollout status deployment/ollama-server --timeout=180s || true
