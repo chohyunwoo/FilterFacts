@@ -1,5 +1,4 @@
-name: Deploy AI & Ollama Servers to NKS
-
+name: Deploy AI Server to NKS
 on:
   push:
     branches:
@@ -8,46 +7,32 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # NCR 로그인
-      - name: Log in to Naver Container Registry (NCR)
+      - name: Build and Push AI Server image
         run: |
+          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/ai-server
+          TAG=$(date +'%Y%m%d-%H%M%S')
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
           echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
             -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
             --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
 
-      # AI 서버 이미지 빌드 및 푸시
-      - name: Build and Push AI Server Image
-        run: |
-          IMAGE="contest-cluster54-registry.kr.ncr.ntruss.com/ai-server:latest"
-          docker build -t $IMAGE -f Dockerfile .
-          docker push $IMAGE
+          docker build -t $IMAGE:$TAG -t $IMAGE:latest -f ./ai-server/Dockerfile .
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
 
-      # Ollama 서버 이미지 빌드 및 푸시
-      - name: Build and Push Ollama Server Image
+      - name: Restore kubeconfig
         run: |
-          IMAGE="contest-cluster54-registry.kr.ncr.ntruss.com/ollama-server:latest"
-          docker build -t $IMAGE -f ollama.Dockerfile .
-          docker push $IMAGE
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.NKS_KUBECONFIG1 }}" | base64 --decode > $HOME/.kube/config
 
-      # 쿠버네티스 클러스터 접근 설정
-      - name: Configure kubectl
+      - name: Deploy AI Server
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.NCP_CONFIG }}" > ~/.kube/config
-
-      # NKS에 배포
-      - name: Deploy to NKS
-        run: |
-          kubectl apply -f ai-deployment.yaml
-          kubectl apply -f ollama-deppployment.yaml
-
-          kubectl rollout status deployment/ai-server --timeout=180s || true
-          kubectl rollout status deployment/ollama-server --timeout=180s || true
+          kubectl set image deployment/ai-server \
+            ai-server=contest-cluster54-registry.kr.ncr.ntruss.com/ai-server:$TAG \
+            --record
+          kubectl rollout status deployment/ai-server --timeout=200s
