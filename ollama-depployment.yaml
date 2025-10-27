@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ollama-server
+  template:
+    metadata:
+      labels:
+        app: ollama-server
+    spec:
+      containers:
+        - name: ollama-server
+          image: contest-cluster54-registry.kr.ncr.ntruss.com/ollama-server:latest
+          ports:
+            - containerPort: 11434
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-service
+spec:
+  selector:
+    app: ollama-server
+  ports:
+    - protocol: TCP
+      port: 11434
+      targetPort: 11434
+  type: LoadBalancer
