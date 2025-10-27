@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: ai-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ai-server
