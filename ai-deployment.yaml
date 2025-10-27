@@ -23,9 +23,9 @@ spec:
             - name: PYTHONUNBUFFERED
               value: "1"
             - name: LLM_BASE_URL
-              value: "http://ollama:11434"
+              value: "http://ollama-service:11434"
             - name: EMBED_ENDPOINT
-              value: "http://ollama:11434"
+              value: "http://ollama-service:11434"
 ---
 apiVersion: v1
 kind: Service
