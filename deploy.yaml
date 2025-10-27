@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: f-f-backend
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: f-f-backend
