@@ -26,6 +26,12 @@ spec:
               value: "http://ollama-service:11434"
             - name: EMBED_ENDPOINT
               value: "http://ollama-service:11434"
+            - name: LOG_LEVEL
+              value: "DEBUG"
+            - name: DEBUG_LLM
+              value: "true"
+            - name: DEBUG_CTRL
+              value: "true"
 ---
 apiVersion: v1
 kind: Service
