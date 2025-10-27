@@ -12,6 +12,8 @@ spec:
       labels:
         app: ai-server
     spec:
+      imagePullSecrets:
+        - name: ncr-secret
       containers:
         - name: ai-server
           image: contest-cluster54-registry.kr.ncr.ntruss.com/ai-server:latest
