@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: ollama
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ollama
@@ -19,7 +19,7 @@ spec:
             - containerPort: 11434
           resources:
             requests:
-              cpu: "1"
+              cpu: "0.5"
               memory: "2Gi"
             limits:
               cpu: "2"
