@@ -16,39 +16,38 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 🔐 NCR 로그인 (AccessKey/SecretKey 기반)
+      # NCR 로그인
       - name: Log in to Naver Container Registry (NCR)
         run: |
           echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
             -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
             --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
 
-      # 🧠 Build & Push AI server image
+      # AI 서버 이미지 빌드 및 푸시
       - name: Build and Push AI Server Image
         run: |
           IMAGE="contest-cluster54-registry.kr.ncr.ntruss.com/ai-server:latest"
           docker build -t $IMAGE -f Dockerfile .
           docker push $IMAGE
 
-      # 🧠 Build & Push Ollama server image
+      # Ollama 서버 이미지 빌드 및 푸시
       - name: Build and Push Ollama Server Image
         run: |
           IMAGE="contest-cluster54-registry.kr.ncr.ntruss.com/ollama-server:latest"
-          docker build -t $IMAGE -f ollama/Dockerfile ./ollama
+          docker build -t $IMAGE -f ollama.Dockerfile .
           docker push $IMAGE
 
-      # ⚙️ kubectl 설정 (Secrets에 저장된 kubeconfig 사용)
+      # 쿠버네티스 클러스터 접근 설정
       - name: Configure kubectl
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.NCP_CONFIG }}" > ~/.kube/config
 
-      # 🚀 Deploy both AI & Ollama servers
+      # NKS에 배포
       - name: Deploy to NKS
         run: |
           kubectl apply -f ai-deployment.yaml
-          kubectl apply -f ollama-deployment.yaml
+          kubectl apply -f ollama-deppployment.yaml
 
-          # Optional: 배포 완료 대기
           kubectl rollout status deployment/ai-server --timeout=180s || true
           kubectl rollout status deployment/ollama-server --timeout=180s || true
