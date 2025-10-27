@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ 1. 코드 체크아웃
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # ✅ 2. AI 서버 Docker 이미지 빌드 & Push
       - name: Build and Push AI Server image
         run: |
           IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/ai-server
@@ -29,14 +27,20 @@ jobs:
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
 
-      # ✅ 3. kubeconfig 복원
+      # ✅ (새로 추가) Naver Cloud 설정 복원
+      - name: Restore Naver Cloud config
+        run: |
+          mkdir -p $HOME/.ncloud
+          echo "${{ secrets.NCP_CONFIG }}" | base64 --decode > $HOME/.ncloud/configure
+          chmod 600 $HOME/.ncloud/configure
+
+      # ✅ kubeconfig 복원
       - name: Restore kubeconfig
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.NKS_KUBECONFIG1 }}" | base64 --decode > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      # ✅ 4. Naver Cloud IAM Authenticator 설치 (❗중요)
       - name: Install Naver Cloud IAM Authenticator
         run: |
           ARCH=$(uname -m)
@@ -45,12 +49,10 @@ jobs:
           else
             FILE_URL="https://github.com/NaverCloudPlatform/ncp-iam-authenticator/releases/download/v1.1.1/ncp-iam-authenticator_linux_arm64"
           fi
-
           curl -fL -o ncp-iam-authenticator ${FILE_URL}
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
 
-      # ✅ 5. AI 서버 배포
       - name: Deploy AI Server
         run: |
           echo "🧠 Deploying ai-server with image tag: $TAG"
