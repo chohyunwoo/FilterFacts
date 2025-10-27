@@ -1,8 +1,8 @@
-# search/llm_client.py
 # -*- coding: utf-8 -*-
 import time
 import uuid
 import requests
+import json
 from typing import Tuple
 
 from .config import (
@@ -14,15 +14,9 @@ from .errors import (
     LLMError, LLMModelNotFound, LLMTimeout, LLMConnectionError
 )
 
-# 모델이 답안을 끝낼 때 넣는 스탑 시퀀스
 _STOP_TOKENS = ["[답변 종료]", "\n[답변 종료]"]
 
 def call_llm(prompt: str) -> Tuple[str, float, str]:
-    """
-    Ollama /api/generate 호출.
-    반환: (answer_text, latency_ms, model_name)
-    실패 시 예외를 raise하여 상위(API)에서 5xx로 매핑.
-    """
     t0 = time.time()
     req_id = str(uuid.uuid4())
     url = f"{LLM_BASE_URL.rstrip('/')}/api/generate"
@@ -30,20 +24,18 @@ def call_llm(prompt: str) -> Tuple[str, float, str]:
     payload = {
         "model": LLM_MODEL,
         "prompt": prompt,
-        "stream": False,
+        "stream": False,  # ✅ 스트리밍 비활성화
         "options": {
-            # 디코딩/길이 관련
             "temperature": LLM_TEMPERATURE,
             "top_p": LLM_TOP_P,
-            "num_predict": LLM_MAX_TOKENS,   # .env에서 512 권장
+            "num_predict": LLM_MAX_TOKENS,
             "repeat_penalty": 1.05,
-            # 조기 종료
             "stop": _STOP_TOKENS,
         },
     }
 
     try:
-        r = requests.post(url, json=payload, timeout=LLM_TIMEOUT)  # .env에서 60 권장
+        r = requests.post(url, json=payload, timeout=LLM_TIMEOUT)
     except requests.exceptions.ReadTimeout as e:
         raise LLMTimeout(f"LLM timeout: {e}") from e
     except requests.exceptions.ConnectionError as e:
@@ -54,7 +46,6 @@ def call_llm(prompt: str) -> Tuple[str, float, str]:
     latency_ms = (time.time() - t0) * 1000.0
 
     if r.status_code == 404:
-        # 모델 미로딩/오타
         raise LLMModelNotFound(f"model {LLM_MODEL} not found (404)")
 
     try:
@@ -63,12 +54,29 @@ def call_llm(prompt: str) -> Tuple[str, float, str]:
         body = r.text[:200] if r.text else ""
         raise LLMError(f"LLM http {r.status_code}: {body}") from e
 
-    data = r.json() or {}
+    # ✅ JSON 안전 파싱 (NDJSON 대응)
+    try:
+        data = r.json()
+    except Exception:
+        text = r.text.strip()
+        if text.startswith("{") and text.endswith("}"):
+            data = json.loads(text)
+        else:
+            lines = [ln for ln in text.splitlines() if ln.strip().startswith("{")]
+            if lines:
+                data = json.loads(lines[-1])
+            else:
+                raise LLMError(f"Invalid JSON response: {text[:200]}")
+
     answer = (data.get("response") or "").strip()
     model_name = (data.get("model") or LLM_MODEL)
 
+    # ✅ 빈 응답 처리 강화
     if not answer:
-        raise LLMError("Empty response from LLM")
+        if data.get("done") is True:
+            answer = "(no text returned from LLM)"
+        else:
+            raise LLMError(f"Empty or malformed response from LLM: {data}")
 
     if DEBUG_LLM:
         print(f"[LLM] model={model_name} latency_ms={latency_ms:.1f} len={len(answer)} req_id={req_id}")
