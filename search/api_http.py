@@ -26,6 +26,7 @@ def ask(req: AskReq):
             k=12,
         )
 
+        # 1)
         raw = out or ""
         clean = raw
 
