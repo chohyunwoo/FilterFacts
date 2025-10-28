@@ -41,7 +41,7 @@ PG = dict(
     password=_envf("PG_PASSWORD", ""),
 )
 
-EMBED_EP    = _envf("EMBED_ENDPOINT", "http://127.0.0.1:11434")
+EMBED_EP    = _envf("EMBED_ENDPOINT", "http://223.130.160.87:11434")
 EMBED_MODEL = _envf("EMBED_MODEL", "nomic-embed-text")
 EMBED_DIM   = _enfi("EMBED_DIM", 768)
 
