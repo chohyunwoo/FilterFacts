@@ -15,7 +15,7 @@ class AskReq(BaseModel):
     category: str | None = None
 
 class AskRes(BaseModel):
-    result: str  # controller가 반환한 최종 문자열(헤더 + 본문)
+    answer: str  # controller가 반환한 최종 문자열(헤더 + 본문)
 
 @app.post("/ask", response_model=AskRes)
 def ask(req: AskReq):
