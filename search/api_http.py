@@ -25,6 +25,12 @@ def ask(req: AskReq):
             category=req.category,
             k=12,
         )
+
+        clean = out
+        clean = clean.split("[답변 시작]")[-1]
+        clean = clean.split("[답변 종료]")[0]
+        clean = clean.strip()
+
         return AskRes(answer=out)
 
     # ====== 인프라/연결/모델 오류 → 5xx ======
