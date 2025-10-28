@@ -25,7 +25,7 @@ def ask(req: AskReq):
             category=req.category,
             k=12,
         )
-        return AskRes(result=out)
+        return AskRes(answer=out)
 
     # ====== 인프라/연결/모델 오류 → 5xx ======
     except LLMTimeout as e:
