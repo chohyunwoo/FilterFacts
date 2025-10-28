@@ -26,10 +26,19 @@ def ask(req: AskReq):
             k=12,
         )
 
-        clean = out
-        clean = clean.split("[답변 시작]")[-1]
-        clean = clean.split("[답변 종료]")[0]
+        raw = out or ""
+        clean = raw
+
+        if "[답변 시작]" in raw:
+            clean = raw.split("[답변 시작]", 1)[1]
+
+        if "[답변 종료]" in clean:
+            clean = clean.split("[답변 종료]", 1)[0]
+
         clean = clean.strip()
+
+        return AskRes(answer=clean)
+
 
         return AskRes(answer=out)
 
