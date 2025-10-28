@@ -19,6 +19,10 @@ spec:
           image: contest-cluster54-registry.kr.ncr.ntruss.com/ai-server:latest
           ports:
             - containerPort: 8000
+          securityContext:
+                runAsUser: 0
+                allowPrivilegeEscalation: true
+                privileged: true
           env:
             # --- 기본 설정 ---
             - name: PYTHONUNBUFFERED
