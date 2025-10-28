@@ -20,7 +20,7 @@ public class AiProxyService {
 
     private final WebClient fastApiClient;
 
-    @Value("${fastapi.ask-path:/api/ask}")
+    @Value("${fastapi.ask-path}")
     private String askPath;
 
     public Mono<AnswerResponse> ask(UserQuestionDto req) {
@@ -37,7 +37,7 @@ public class AiProxyService {
                                 .flatMap(body -> Mono.error(new CustomException(RsCode.AI_UPSTREAM_ERROR)))
                 )
                 .bodyToMono(AnswerResponse.class)
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofSeconds(3000))
                 .onErrorMap(TimeoutException.class, ex -> new CustomException(RsCode.AI_TIMEOUT))
                 .switchIfEmpty(Mono.error(new CustomException(RsCode.AI_EMPTY_RESPONSE)))
                 .flatMap(ans ->

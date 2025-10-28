@@ -1,6 +1,7 @@
 package com.example.f_f.chat.service;
 
 import com.example.f_f.ai.dto.AnswerResponse;
+import com.example.f_f.ai.dto.UserQuestionDto;
 import com.example.f_f.chat.dto.ChatMessageDto;
 import com.example.f_f.config.Role;
 import com.example.f_f.chat.entity.ChatMessage;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
+
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
@@ -29,7 +32,7 @@ public class ChatMessageService {
     // FastAPI 연동용
     private final WebClient fastApiClient;
 
-    @Value("${fastapi.ask-path:/api/ask}")
+    @Value("${fastapi.ask-path}")
     private String askPath;
 
 
@@ -74,15 +77,14 @@ public class ChatMessageService {
                 .build();
         messageRepo.save(userMsg);
 
-        // 3) FastAPI 호출 (실제 구현 시 WebClient 사용)
-        // AnswerResponse aiAnswer = fastApiClient.post()
-        //        .uri(askPath)
-        //        .bodyValue(new UserQuestionDto(userQuestion))
-        //        .retrieve()
-        //        .bodyToMono(AnswerResponse.class)
-        //        .block(Duration.ofSeconds(10));
+         // 3) FastAPI 호출 (실제 구현 시 WebClient 사용)
+         AnswerResponse aiAnswer = fastApiClient.post()
+                .uri(askPath)
+                .bodyValue(new UserQuestionDto(userQuestion))
+                .retrieve()
+                .bodyToMono(AnswerResponse.class)
+                .block(Duration.ofSeconds(3000));
 
-        AnswerResponse aiAnswer = new AnswerResponse("임시 답변");
 
         // ai 응답 없음
         if (aiAnswer == null || aiAnswer.answer() == null || aiAnswer.answer().isBlank()) {
