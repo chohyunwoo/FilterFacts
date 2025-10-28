@@ -47,6 +47,8 @@ spec:
               value: "http://ollama-service:11434"
             - name: EMBED_ENDPOINT
               value: "http://ollama-service:11434"
+            - name: EMBED_MODEL
+              value: "nomic-embed-text"
 
 ---
 apiVersion: v1
