@@ -25,32 +25,30 @@ def ask(req: AskReq):
             category=req.category,
             k=12,
         )
-        # 여기까지 왔으면 "업무로직 성공" → HTTP 200
         return AskRes(result=out)
 
-# ====== 인프라/연결/모델 오류 → 5xx ======
-except LLMTimeout as e:
-    print("⏱ Timeout Error:", e)
-    raise HTTPException(status_code=504, detail=f"Timeout: {str(e)[:200]}")
+    # ====== 인프라/연결/모델 오류 → 5xx ======
+    except LLMTimeout as e:
+        print("⏱ Timeout Error:", e)
+        raise HTTPException(status_code=504, detail=f"Timeout: {str(e)[:200]}")
 
-except LLMConnectionError as e:
-    print("🔌 Connection Error:", e)
-    raise HTTPException(status_code=502, detail=f"ConnectionError: {str(e)[:200]}")
+    except LLMConnectionError as e:
+        print("🔌 Connection Error:", e)
+        raise HTTPException(status_code=502, detail=f"ConnectionError: {str(e)[:200]}")
 
-except LLMModelNotFound as e:
-    print("❌ Model Not Found Error:", e)
-    raise HTTPException(status_code=500, detail=f"ModelNotFound: {str(e)[:200]}")
+    except LLMModelNotFound as e:
+        print("❌ Model Not Found Error:", e)
+        raise HTTPException(status_code=500, detail=f"ModelNotFound: {str(e)[:200]}")
 
-except LLMError as e:
-    print("🤖 LLM Error:", e)
-    raise HTTPException(status_code=500, detail=f"LLMError: {str(e)[:200]}")
+    except LLMError as e:
+        print("🤖 LLM Error:", e)
+        raise HTTPException(status_code=500, detail=f"LLMError: {str(e)[:200]}")
 
-
-except Exception as e:
-    import traceback
-    print("🔥 [UNEXPECTED ERROR] in /ask:", e)
-    traceback.print_exc()
-    raise HTTPException(
-        status_code=500,
-        detail=f"Unexpected: {type(e).__name__}: {str(e)[:200]}"
-    )
+    except Exception as e:
+        import traceback
+        print("🔥 [UNEXPECTED ERROR] in /ask:", e)
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected: {type(e).__name__}: {str(e)[:200]}"
+        )
