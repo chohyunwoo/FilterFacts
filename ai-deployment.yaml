@@ -48,9 +48,9 @@ spec:
 
             # --- Ollama (LLM) 연결 정보 ---
             - name: LLM_BASE_URL
-              value: "http://ollama-service:11434"
+              value: "http://223.130.160.87:11434"
             - name: EMBED_ENDPOINT
-              value: "http://ollama-service:11434"
+              value: "http://223.130.160.87:11434"
             - name: EMBED_MODEL
               value: "nomic-embed-text"
             - name: LLM_MODEL
