@@ -28,23 +28,29 @@ def ask(req: AskReq):
         # 여기까지 왔으면 "업무로직 성공" → HTTP 200
         return AskRes(result=out)
 
-    # ====== 인프라/연결/모델 오류 → 5xx ======
-    except LLMTimeout:
-        # 내부 상세는 노출하지 않음
-        raise HTTPException(status_code=504, detail="LLM gateway timeout")
-    except LLMConnectionError:
-        raise HTTPException(status_code=502, detail="LLM upstream unavailable")
-    except LLMModelNotFound:
-        raise HTTPException(status_code=500, detail="LLM model not available")
-    except LLMError:
-        raise HTTPException(status_code=500, detail="LLM internal error")
+# ====== 인프라/연결/모델 오류 → 5xx ======
+except LLMTimeout as e:
+    print("⏱ Timeout Error:", e)
+    raise HTTPException(status_code=504, detail=f"Timeout: {str(e)[:200]}")
 
-    # ====== 그 외 예기치 못한 오류 → 500 ======
-#     except Exception:
-#         raise HTTPException(status_code=500, detail="Internal server error")
-    # ✅ 예외 원인 출력 추가
-    except Exception as e:
-        import traceback
-        print("🔥 [ERROR] Exception in /ask:", e)
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail="Internal server error")
+except LLMConnectionError as e:
+    print("🔌 Connection Error:", e)
+    raise HTTPException(status_code=502, detail=f"ConnectionError: {str(e)[:200]}")
+
+except LLMModelNotFound as e:
+    print("❌ Model Not Found Error:", e)
+    raise HTTPException(status_code=500, detail=f"ModelNotFound: {str(e)[:200]}")
+
+except LLMError as e:
+    print("🤖 LLM Error:", e)
+    raise HTTPException(status_code=500, detail=f"LLMError: {str(e)[:200]}")
+
+
+except Exception as e:
+    import traceback
+    print("🔥 [UNEXPECTED ERROR] in /ask:", e)
+    traceback.print_exc()
+    raise HTTPException(
+        status_code=500,
+        detail=f"Unexpected: {type(e).__name__}: {str(e)[:200]}"
+    )
