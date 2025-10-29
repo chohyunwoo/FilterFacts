@@ -76,7 +76,7 @@ LLM_BASE_URL    = _envf("LLM_BASE_URL", "http://223.130.160.87:11434")
 LLM_TEMPERATURE = _envf_float("LLM_TEMPERATURE", 0.2)
 LLM_TOP_P       = _envf_float("LLM_TOP_P", 0.9)
 LLM_MAX_TOKENS  = _enfi("LLM_MAX_TOKENS", 1024)   # ← Ollama options.num_predict로 매핑
-LLM_TIMEOUT     = _enfi("LLM_TIMEOUT", 30)        # 초 단위
+LLM_TIMEOUT     = _enfi("LLM_TIMEOUT", 180)        # 초 단위
 LLM_NUM_CTX     = _enfi("LLM_NUM_CTX", 2048)      # ← Ollama options.num_ctx로 매핑
 LLM_MAX_RETRIES = _enfi("LLM_MAX_RETRIES", 2)     # 재시도 횟수
 
