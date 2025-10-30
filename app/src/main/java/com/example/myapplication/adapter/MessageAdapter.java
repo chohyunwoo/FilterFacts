@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import com.example.myapplication.common.ChatItem;
 import com.example.myapplication.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MessageAdapter extends ListAdapter<ChatItem, RecyclerView.ViewHolder> {
@@ -29,6 +30,15 @@ public class MessageAdapter extends ListAdapter<ChatItem, RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         int layout = (viewType == TYPE_USER) ? R.layout.item_message_user : R.layout.item_message_ai;
         View v = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
+        
+        // 아이템 뷰의 레이아웃 파라미터 수정
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+        if (params != null) {
+            params.topMargin = 0;
+            params.bottomMargin = 0;
+            v.setLayoutParams(params);
+        }
+        
         return new RecyclerView.ViewHolder(v) {};
     }
 
@@ -49,10 +59,12 @@ public class MessageAdapter extends ListAdapter<ChatItem, RecyclerView.ViewHolde
     };
 
     public void add(ChatItem item) {
-        submitList(getCurrentList());
+        List<ChatItem> currentList = new ArrayList<>(getCurrentList());
+        currentList.add(item);
+        submitList(currentList);
     }
 
     public void clear() {
-        submitList(null);
+        submitList(new ArrayList<>());
     }
 }

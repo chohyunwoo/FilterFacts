@@ -93,9 +93,15 @@ public class ChatActivity extends AppCompatActivity {
 
         adapter = new MessageAdapter();
         LinearLayoutManager lm = new LinearLayoutManager(this);
-        lm.setStackFromEnd(true);
+        lm.setStackFromEnd(false);  // 메시지 위부터 쌓이게
+        lm.setReverseLayout(false);  
         rvMessages.setLayoutManager(lm);
         rvMessages.setAdapter(adapter);
+        
+        // Remove item decoration (divider lines)
+        if (rvMessages.getItemDecorationCount() > 0) {
+            rvMessages.removeItemDecorationAt(0);
+        }
 
         // 네비게이션 뷰 안의 rvChats
         navigationView = findViewById(R.id.navigationView);
@@ -130,8 +136,18 @@ public class ChatActivity extends AppCompatActivity {
         vm.getError().observe(this, msg -> { if (msg != null && !msg.isEmpty()) Toast.makeText(ChatActivity.this, msg, Toast.LENGTH_SHORT).show(); });
         vm.getLoggedOut().observe(this, out -> { if (out != null && out) purgeSessionAndGoLogin(); });
 
-        // 카테고리 Chip은 서버 전송 X (UI만)
-        categoryChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {});
+        // 카테고리 Chip 동작 수정
+        categoryChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.chipCosmetics) {
+                // 화장품 칩 클릭 시 토스트 메시지 표시하고 선택 해제
+                Toast.makeText(this, "추후 개발 예정입니다.", Toast.LENGTH_SHORT).show();
+                // 화장품 칩 선택 해제
+                categoryChipGroup.check(R.id.chipFood);
+            }
+        });
+        
+        // 기본으로 식품 칩 선택
+        categoryChipGroup.check(R.id.chipFood);
 
         // 위로 스크롤 시 과거 페이지 로딩
         rvMessages.addOnScrollListener(new RecyclerView.OnScrollListener() {

@@ -79,7 +79,7 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     cb.onSuccess(response.body());
                 } else {
-                    cb.onError("code=" + response.code());
+                    cb.onError("아이디와 비밀번호를 다시 확인해주세요.");
                 }
             }
 
@@ -107,20 +107,54 @@ public class AuthRepository {
     public void verifyCode(VerifyCodeRequest body, SimpleCallback cb) {
         retrofit2.Call<ResponseBody> call = apiService.verifyCode(body);
         call.enqueue(new retrofit2.Callback<ResponseBody>() {
-            @Override public void onResponse(retrofit2.Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
-                if (response.isSuccessful()) cb.onSuccess(); else cb.onError("code=" + response.code());
+            @Override
+            public void onResponse(retrofit2.Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    cb.onSuccess();
+                } else {
+                    String errorMessage = "예기치 못한 오류가 발생했습니다. 다시 시도해주세요.";
+                    if (response.code() == 400) {
+                        errorMessage = "인증 번호를 확인해주세요.";
+                    } else if (response.code() == 410) {
+                        errorMessage = "인증 시간이 만료되었습니다. 다시 요청해주세요.";
+                    }
+                    cb.onError(errorMessage);
+                }
             }
-            @Override public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) { cb.onError(t.getMessage()); }
+
+            @Override
+            public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
+                cb.onError("네트워크 오류가 발생했습니다. 연결 상태를 확인해주세요.");
+            }
         });
     }
+
+
 
     public void register(UserJoinRequest body, SimpleCallback cb) {
         retrofit2.Call<Void> call = apiService.register(body);
         call.enqueue(new retrofit2.Callback<Void>() {
-            @Override public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
-                if (response.isSuccessful()) cb.onSuccess(); else cb.onError("code=" + response.code());
+            @Override
+            public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                if (response.isSuccessful()) {
+                    cb.onSuccess();
+                } else {
+                    // String errorMessage = "예기치 못한 오류가 발생했습니다. 다시 시도해주세요.";
+                    String errorMessage = "이미 등록된 이메일입니다.";
+                    if (response.code() == 409) {
+                        errorMessage = "이미 사용 중인 아이디입니다.";
+                    } else if (response.code() == 412) {
+                        errorMessage = "이메일 인증이 필요합니다.";
+                    }
+                    cb.onError(errorMessage);
+                }
             }
-            @Override public void onFailure(retrofit2.Call<Void> call, Throwable t) { cb.onError(t.getMessage()); }
+
+            @Override
+            public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                cb.onError("네트워크 오류가 발생했습니다. 연결 상태를 확인해주세요.");
+            }
         });
     }
 }
+

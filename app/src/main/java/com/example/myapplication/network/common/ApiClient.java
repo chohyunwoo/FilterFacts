@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -44,6 +45,9 @@ public class ApiClient {
 
         // OkHttp client
         this.http = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS) // 1. 연결 타임아웃 (15초)
+                .readTimeout(60, TimeUnit.SECONDS)    // 2. 응답 타임아웃 (30초)
+                .writeTimeout(30, TimeUnit.SECONDS)   // 3. 쓰기 타임아웃 (15초)
                 .addInterceptor(logging)
                 .build();
 

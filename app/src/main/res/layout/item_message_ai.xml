@@ -5,8 +5,8 @@
     android:gravity="start"
     android:paddingStart="12dp"
     android:paddingEnd="12dp"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp">
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp">
 
     <TextView
         android:id="@+id/tvMsg"

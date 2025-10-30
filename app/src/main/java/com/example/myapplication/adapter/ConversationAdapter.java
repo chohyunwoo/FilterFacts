@@ -1,5 +1,6 @@
 package com.example.myapplication.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ public class ConversationAdapter extends ListAdapter<ConversationItem, Conversat
     public void onBindViewHolder(@NonNull Holder h, int position) {
         ConversationItem item = getItem(position);
         h.title.setText(item.getTitle());
+         h.title.setTextColor(Color.WHITE);
         h.itemView.setOnClickListener(v -> {
             if (onItemClick != null) onItemClick.onClick(item);
         });

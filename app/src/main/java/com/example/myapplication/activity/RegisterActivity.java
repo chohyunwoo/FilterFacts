@@ -41,7 +41,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         vm.getStatus().observe(this, s -> { if (s != null) setStatus(s); });
         vm.getEmailVerified().observe(this, ok -> {
-            boolean v = ok != null && ok;
+            if (ok == null) {
+                codeErrorTextView.setVisibility(View.GONE);
+                return;
+            }
+
+            boolean v = ok;
             emailVerified = v;
             if (v) {
                 lastEmail = text(emailEditText);

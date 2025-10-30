@@ -19,7 +19,7 @@ public class RegisterViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> status = new MutableLiveData<>("");
-    private final MutableLiveData<Boolean> emailVerified = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> emailVerified = new MutableLiveData<>(null);
     private final MutableLiveData<Boolean> registered = new MutableLiveData<>(false);
     private final MutableLiveData<String> error = new MutableLiveData<>(null);
 

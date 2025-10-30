@@ -28,7 +28,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 app:title="@string/title_ai_coach"
-                android:titleTextColor="@android:color/white"
+                app:titleTextColor="#FFFFFF"
                 app:navigationIcon="@drawable/ic_menu_24"
                 app:navigationIconTint="@android:color/white"
                 app:titleCentered="false" />
@@ -40,20 +40,22 @@
             android:layout_height="match_parent"
             android:background="#000000"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:paddingTop="?attr/actionBarSize">
+            android:paddingTop="?attr/actionBarSize"
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvMessages"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:clipToPadding="false"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="140dp"
-                android:fadingEdgeLength="8dp"
-                android:requiresFadingEdge="vertical"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
                 android:background="#000000"
+                android:clipChildren="false"
+                android:overScrollMode="never"
                 app:layout_constrainedHeight="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/inputCard"
@@ -123,15 +125,15 @@
                 android:id="@+id/inputCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                app:cardBackgroundColor="#1E1E1E"
-                app:strokeColor="@color/ai_border"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="12dp"
+                android:layout_margin="0dp"
+                app:cardBackgroundColor="#000000"
+                app:strokeColor="#00000000"
+                app:strokeWidth="0dp"
+                app:cardCornerRadius="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:cardElevation="8dp">
+                app:cardElevation="0dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilQuestion"
@@ -182,6 +184,8 @@
         android:background="#000000"
         android:fitsSystemWindows="true"
         app:itemIconTint="@android:color/white"
+        app:itemTextAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:itemTextAppearanceActiveBoldEnabled="true"
         app:itemTextColor="@android:color/white"
         app:menu="@menu/menu_empty">
 
