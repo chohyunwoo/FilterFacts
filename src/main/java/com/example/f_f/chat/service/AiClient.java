@@ -14,7 +14,7 @@ public class AiClient {
     private final WebClient webClient;
     private final String path;
 
-    public AiClient(@Value("${ai.base-url:http://localhost:8000}") String baseUrl,
+    public AiClient(@Value("${ai.base-url}") String baseUrl,
                     @Value("${ai.path:/infer}") String path) {
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
         this.path = path;

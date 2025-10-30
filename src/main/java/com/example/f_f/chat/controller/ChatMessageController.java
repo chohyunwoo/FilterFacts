@@ -28,12 +28,6 @@ public class ChatMessageController {
     /** 안드로이드: 질문 → (AI)응답 한 번에 */
     @PostMapping("/ask")
     public ResponseEntity<AnswerResponse> ask(Authentication auth, @RequestBody QuestionRequest req) {
-//        if (auth.getName() == null || auth.getName().isBlank())
-//            throw new IllegalArgumentException("userId is required");
-//        if (req.getConversationId() == null)
-//            throw new IllegalArgumentException("conversationId is required");
-//        if (req.getQuestion() == null || req.getQuestion().isBlank())
-//            throw new IllegalArgumentException("question is required");
 
         // 3) 어시스턴트 답변 저장
         AnswerResponse answer = chatMessageService.addAssistantMessage(req.getConversationId(), auth.getName(), req.getQuestion());
