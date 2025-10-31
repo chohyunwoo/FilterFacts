@@ -1,4 +1,4 @@
-name: Deploy FilterFacts (Backend + PostgreSQL pgvector) to Naver Cloud Kubernetes
+name: Deploy FilterFacts to Naver Cloud Kubernetes (Token-based)
 
 on:
   push:
@@ -10,54 +10,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ 1️⃣ 코드 체크아웃
+      # ✅ 1. 코드 체크아웃
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # ✅ 2️⃣ JDK 21 설치
+      # ✅ 2. JDK 설정
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      # ✅ 3️⃣ Gradle 빌드
+      # ✅ 3. Gradle 빌드
       - name: Build with Gradle
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      # ✅ 4️⃣ NCP Container Registry 로그인
-      - name: Login to NCP Container Registry
+      # ✅ 5. Backend Docker 이미지 빌드 & Push
+      - name: Build and Push Backend Docker image
+        id: build
         run: |
+          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend
+          TAG=$(date +'%Y%m%d-%H%M%S')
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "🚀 Building Backend image with tag: $TAG"
+
           echo "${{ secrets.NCP_REGISTRY_PASSWORD }}" | docker login \
             -u "${{ secrets.NCP_REGISTRY_USERNAME }}" \
             --password-stdin contest-cluster54-registry.kr.ncr.ntruss.com
 
-      # ✅ 5️⃣ Backend 이미지 빌드 & Push
-      - name: Build and Push Backend Docker image
-        id: backend
-        run: |
-          IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend
-          TAG=$(date +'%Y%m%d-%H%M%S')
-          echo "BACKEND_TAG=$TAG" >> $GITHUB_ENV
-          echo "🚀 Building Backend image with tag: $TAG"
           docker build -t $IMAGE:$TAG -t $IMAGE:latest .
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
-          echo "✅ Backend image push complete!"
 
-      # ✅ 6️⃣ PostgreSQL + pgvector 이미지 빌드 & Push
-      - name: Build and Push PostgreSQL pgvector image
-        id: pgvector
-        run: |
-          PG_IMAGE=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-postgres
-          echo "🐘 Building PostgreSQL pgvector image..."
-          docker build -t $PG_IMAGE:latest -f ./Dockerfile.pgvector .
-          docker push $PG_IMAGE:latest
-          echo "✅ PostgreSQL pgvector image push complete!"
+          echo "✅ Backend push complete!"
 
-      # ✅ 7️⃣ NCP IAM Authenticator 설치
+      # ✅ 6. IAM Authenticator 설치
       - name: Install Naver Cloud IAM Authenticator
         run: |
           ARCH=$(uname -m)
@@ -66,47 +55,39 @@ jobs:
           else
             FILE_URL="https://github.com/NaverCloudPlatform/ncp-iam-authenticator/releases/download/v1.1.1/ncp-iam-authenticator_linux_arm64"
           fi
+
           curl -fL -o ncp-iam-authenticator ${FILE_URL}
           chmod +x ncp-iam-authenticator
           sudo mv ncp-iam-authenticator /usr/local/bin/
 
-      # ✅ 8️⃣ NCP 설정 복원
+      # ✅ 7. 설정 가져오기
       - name: Restore Naver Cloud config
         run: |
           mkdir -p $HOME/.ncloud
           echo "${{ secrets.NCP_CONFIG }}" | base64 --decode > $HOME/.ncloud/configure
           chmod 600 $HOME/.ncloud/configure
 
-      # ✅ 9️⃣ Kubeconfig 복원
       - name: Restore kubeconfig
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.NKS_KUBECONFIG1 }}" | base64 --decode > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      # ✅ 🔟 PostgreSQL Deployment 반영
-      - name: Apply PostgreSQL Deployment
+      # ✅ 8. 배포 파일 반영 (Pod replica, ENV 변경 적용)
+      - name: Apply Deployment YAML
         run: |
-          echo "📦 Applying PostgreSQL Deployment (postgres-deploy.yaml)..."
-          kubectl apply -f postgres-deploy.yaml
-          kubectl rollout status deployment/postgres --timeout=200s || true
-
-      # ✅ 1️⃣1️⃣ Backend Deployment 반영
-      - name: Apply Backend Deployment
-        run: |
-          echo "📦 Applying Backend Deployment (deploy.yaml)..."
           kubectl apply -f deploy.yaml
 
-      # ✅ 1️⃣2️⃣ Backend 새 TAG 반영 (롤링 업데이트)
+      # ✅ 9. Backend 새로운 TAG 적용 (롤링 업데이트)
       - name: Deploy Backend with Updated Image Tag
         run: |
-          echo "☕ Deploying backend with new image tag: ${{ env.BACKEND_TAG }}"
+          echo "☕ Deploying backend with tag: $TAG"
           kubectl set image deployment/f-f-backend \
-            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:${{ env.BACKEND_TAG }} \
+            f-f-backend=contest-cluster54-registry.kr.ncr.ntruss.com/filterfacts-backend:$TAG \
             --record
           kubectl rollout status deployment/f-f-backend --timeout=200s
 
-      # ✅ 1️⃣3️⃣ 배포 상태 검증
+      # ✅ 10. 배포 상태 확인
       - name: ✅ Verify Deployment Status
         run: |
           kubectl get pods -o wide
